@@ -1,0 +1,3 @@
+set ulimit:
+
+ulimit -n 102400
