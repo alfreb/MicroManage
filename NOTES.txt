@@ -1,3 +1,8 @@
 set ulimit:
 
 ulimit -n 102400
+
+
+Install Qt:
+
+apt-get install libqt4-dev

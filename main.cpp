@@ -7,6 +7,12 @@
 #include <QTime>
 #include <QTimer>
 
+//Locals
+#include "class_microMachine.h"
+#include "class_microMachine.cpp"
+#include "simulation_menu.h"
+
+
 using namespace std;
 
 class microManager : public QObject {
@@ -15,123 +21,122 @@ class microManager : public QObject {
   
   int vmCount;
   QTime t;
-  vector<QProcess*> vms;
+  vector<qemuVm*> vms;
 
 public:
   
   microManager(int _vmCount,QObject *parent=0) : QObject(parent),vmCount(_vmCount) 
   {};
   ~microManager(){
-    vector<QProcess*>::iterator it;
+    vector<qemuVm*>::iterator it;
     cout << "Killing all processes" << endl;
     for(it=vms.begin(); it!=vms.end(); it++){
-      (*it)->kill();
-      
-      //No need to delete the objects - it will just take forever, and we're exiting anyway.
+      (*it)->halt();      
+      //No need to delete the objects - it will take forever and we're exiting anyway.
       //delete(*it);
-    }
-    
+    } 
+};
 
-  };
-										     
-										     
-										     
 public slots:
   
-  void doneBooting(){
-    QByteArray data;    
-    int vmToPoke(0);
-    cout << "Done booting. " << endl;
-    do{
-      data.clear();
-      cout << "Enter id of a vm to poke: " << endl;
-      cin >> vmToPoke;
-      if(vmToPoke>=0 and vmToPoke<vms.size()){
-	t.start();
-	vms[vmToPoke]->write("a"); //If this happens before vm is booted, it will mess up the seiral port
-	vms[vmToPoke]->waitForReadyRead();
-	data.append(vms[vmToPoke]->readAll());	
-	qDebug() << "Response: " << data << " response time: " << t.elapsed() << endl;
+  void afterBoot(){
+    std::string input="";
+    
+    while(true){
+      
+
+      print_menu(vms.size());
+      
+      cin >> input;
+      
+      switch(QString(input.c_str()).at(0).toLower().toLatin1()){
+      case '1':
+	menu_vmInteraction();
+	break;
+      case '2':
+	menu_bootMore();
+	break;
+      case '3':
+	menu_time_n_random_requests();
+	break;
+      case 'q':	
+	cout <<"Exiting" << endl;
+	emit exit();
+	return;
+      }                  
+    }    
+  }
+
+  void menu_vmInteraction(){
+    response data;    
+    int vmNr(0);
+    qemuVm* vm(0);
+    char req='a';
+
+    cout << endl << "Enter vm id: ";
+    cin >> vmNr;      
+    if(vmNr>=0 and vmNr<vms.size()){
+      vm=vms[vmNr];
+      cout << "Enter a single character request" << endl;
+      cin >> req;
+      data=vm->processRequest_timed(string(&req).c_str(),t); 
+      qDebug() << "Response: " << data 
+	       << " response time: " << vm->lastResponseTime()
+	       << " QoS: " << vm->qos();
       }else{
 	cout << "Invalid ID. Type a number between 0 and " << vms.size() << endl;
       }
-      
-    }while(vmToPoke>0);
-    
-    cout <<"Exiting" << endl;
-    emit exit();
   }
-  
-  void bootAll(){        
 
-    QStringList args;
-    args << "-hda" << "../microMachines_experimental_clean/microMachine.hda";
-    args << "--nographic";
- 
-  
-    QProcess* proc;
-    for(int i=0; i<vmCount; i++){
-      proc=new QProcess;
-      //    proc->setProcessChannelMode(QProcess::MergedChannels);
-      proc->start("qemu-system-i386",args);
-      //      proc->waitForStarted(); //Creates buffer overflow after 2-300 vm's
-      vms.push_back(proc);  
-      //      qDebug()<< i << " vm's launched";
-      /*
-      if(i>0 and i%100==0){
-	cout << "Booted " << i << " vm's - taking a break" << endl;
-	sleep(3);
-	cout << "Continuing" << endl;
-	}*/
-      
-    
-    };
+  void menu_time_n_random_requests(){
+    int sampleCount(0);
+    int vmNr(0);
+    qemuVm* vm(0);
+    QString data;
 
-    cout << "Booted " << vmCount << " vm's "<< endl;
-    
-    /*
+    cout << endl << "How many samples? " << endl;
+    cin >> sampleCount;
 
-      for(int i=0;i<vmCount; i++){
-      //    data.clear();
-      //vms[i]->waitForStarted();
-      vms[i]->waitForReadyRead();
-      //    
-      //cout << " vm " << i << " confirmed boot " << endl;
-      }*/
+    int timeTotal(0);
     
-    //int keepGoing;
-    
-    //cout << "All VM's booted. Enter the number of a VM to poke: " << endl;
-    /*cin >> keepGoing;
-    
-    /*
-    srand(time(NULL));
-
-    //  p1->write("ls\n");
-  
-    int sleepTime(0);
-    QTime t;
-    int timeout(60000);//MS to wait for response
-    
-    
-    while(true){
-      //sleepTime=rand()%10;
-      //qDebug()<< "Sleeping " << sleepTime << "secs.";
-      //sleep(sleepTime);
-      //    qDebug()<<"Awake. Timing a request ";
-      //    data.clear(); //Do we need to read it? No.
-      t.start();
-      proc->write("a");    
-
-      if(proc->waitForReadyRead())
-	qDebug()<< "Request took " << t.elapsed() << " ms. \n";
-      else
-	qDebug()<<"Timed out! Waited for " <<  timeout << " ms. and nothing.";
+    for(int i=0;i<sampleCount; i++){
+      vmNr=rand() % vms.size();
+      vm=vms[vmNr];
+      data=vm->processRequest_timed("a",t);
+      qDebug()<< "VM nr. " << vmNr<< "Response: " << data
+	       << " response time: " << vm->lastResponseTime()
+	       << " QoS: " << vm->qos();
+      timeTotal+=vm->lastResponseTime();
     }
+    cout << endl << "Average response time over " 
+	 << sampleCount << " samples: " << float(timeTotal)/float(sampleCount) << " ms."
+	 << endl;
+  }
 
-    qDebug("Done");
-    qDebug()<<data;
-    */
+  void bootN(int n){    
+    qemuVm* vm;
+    for(int i=0;i<n; i++){
+      vm=new qemuVm;
+      vm->boot();
+      vms.push_back(vm);
+    }
+    vmCount=vms.size();
+  }
+
+  void menu_bootMore(){
+    int count(0);
+    cout << endl << "How many more? ";
+    cin>>count;
+    
+    cout << "Booting " << count << " more machines" << endl;
+    
+    bootN(count);
+    
+  }
+
+  
+  void bootAll(){
+    bootN(vmCount);
     emit allBooted();
   }
 
@@ -147,18 +152,21 @@ signals:
 int main(int argc, char *argv[])
 {        
   
+  srand(time(0));
+  
   qDebug("\nServerside MicroManager\n");
   
   QCoreApplication a(argc, argv);
-  int vmCount(48);
 
-  if(argc>0)
+  int vmCount(0);
+
+  if(argc>1)
     vmCount=atoi(argv[1]);
 
   microManager* manager=new microManager(vmCount,&a);
 
   QObject::connect(manager,SIGNAL(exit()), &a,SLOT(quit()));
-  QObject::connect(manager,SIGNAL(allBooted()),manager,SLOT(doneBooting()));
+  QObject::connect(manager,SIGNAL(allBooted()),manager,SLOT(afterBoot()));
   
   //Put the manager into the event-loop
   QTimer::singleShot(0,manager,SLOT(bootAll()));
