@@ -6,9 +6,14 @@
 
 class qemuVm : public microMachine
 {
+    Q_OBJECT
+
     QProcess proc;
     static QString command;
     static QStringList args;
+
+    //The first character output by VM after boot
+    const char boot_char;
 
 public:
     qemuVm();
@@ -20,6 +25,9 @@ public:
     virtual void write(const char* s);
     virtual response processRequest(const char* req);
     virtual response processRequest_timed(const char* req,QTime& t);
+
+public slots:
+  void firstByteRecieved();
 
 };
 

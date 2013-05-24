@@ -21,7 +21,9 @@ QStringList qemuVm::args=cmd_args();
   Construct / Destruct
 */
 qemuVm::qemuVm() :
-  microMachine() {}
+    microMachine(),boot_char('!') {
+    QObject::connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+}
 
 /*
 qemuVm::qemuVm(QString n) :
@@ -61,11 +63,14 @@ QString qemuVm::readAll(){
 
 void qemuVm::write(const char* s){
   if(isBooted==0){
+      /*
     qDebug()<<"Waiting for vm to boot...";
     QString bootString=readAll();
     if(bootString.size()>1)
       qDebug()<<"Boot signal too big? : '" << bootString << "'. Only first char saved.";
-    isBooted=bootString.at(0);
+    isBooted=bootString.at(0);*/
+      qDebug()<<"VM has not yet confirmed boot. Try again later.";
+      return;
   }
 
   proc.write(s);
@@ -90,3 +95,12 @@ response qemuVm::processRequest_timed(const char* req,QTime& t){
   return resp;
 }
 
+void qemuVm::firstByteRecieved(){
+    QByteArray data=proc.readAll();
+    if(data[0]==boot_char){
+        this->isBooted=true;
+        emit bootConfirmed();
+    }else{
+        qDebug()<<"Unexpected process output: " << data;
+    }
+}

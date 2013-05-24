@@ -20,7 +20,8 @@ microManager::~microManager(){
 }
 
 void microManager::menu_main(int vmCount){
-    cout << " S I M U L A T I O N   M A N A G E R " << endl
+    cout << endl << endl
+         << " S I M U L A T I O N   M A N A G E R " << endl
          << " ===================================" << endl
          << endl
          << vmCount << " VM's currently booted" << endl
