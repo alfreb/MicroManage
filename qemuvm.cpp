@@ -98,6 +98,7 @@ response qemuVm::processRequest_timed(const char* req,QTime& t){
 void qemuVm::firstByteRecieved(){
     QByteArray data=proc.readAll();
     if(data[0]==boot_char){
+        qDebug()<<"Boot confirmed: vm "<< this->numericId;
         this->isBooted=true;
         emit bootConfirmed();
     }else{
