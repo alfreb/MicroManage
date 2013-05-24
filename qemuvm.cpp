@@ -1,43 +1,5 @@
-#include "class_microMachine.h"
-
-/*
-  Base class initialization
-*/
-int microMachine::instanceCount=0;
-
-microMachine::microMachine(QString n) : 
-  numericId(++instanceCount),isBooted(0),instanceName(n),
-  bestResponseTime_ms(-1),lastResponseTime_ms(0),currentQoS(-1){}
-
-microMachine::microMachine() : 
-  numericId(++instanceCount),isBooted(0),instanceName("N/A"),
-  bestResponseTime_ms(-1),lastResponseTime_ms(0),currentQoS(-1){}
-
-
-microMachine::~microMachine(){
-  /* 
-     Nothing allocated, nothing freed.
-     
-     OBS: unexpected behavior will result from when deleting a VM object before the process is stopped.     
-  */  
-}
-
-
-/*
-  Getters
-*/
-int microMachine::id(){
-  return numericId;
-}
-
-unsigned int microMachine::lastResponseTime(){
-  return lastResponseTime_ms;
-}
-
-
-float microMachine::qos(){
-  return currentQoS;
-}
+#include "qemuvm.h"
+#include "QDebug"
 
 /*
   Statics
@@ -55,32 +17,37 @@ QStringList cmd_args(){
 
 QStringList qemuVm::args=cmd_args();
 
-
-
 /*
   Construct / Destruct
 */
 qemuVm::qemuVm() :
   microMachine() {}
 
+/*
 qemuVm::qemuVm(QString n) :
   microMachine(n){}
+*/
 
 qemuVm::~qemuVm(){
   halt();
 }
 
-
 /*
   Start / Stop
 */
-void qemuVm::boot(){  
+void qemuVm::boot(){
   proc.start(command,args);
+
+  //This is necessary if the command is not valid, i.e. on mac.
+  if(!proc.waitForStarted()){
+      throw std::string("Unable to run "+command.toStdString());
+  }
 }
 
 void qemuVm::halt(){
   proc.kill();
 }
+
 
 
 /*
@@ -100,13 +67,13 @@ void qemuVm::write(const char* s){
       qDebug()<<"Boot signal too big? : '" << bootString << "'. Only first char saved.";
     isBooted=bootString.at(0);
   }
-    
+
   proc.write(s);
 }
 
-response qemuVm::processRequest(const char* req){  
+response qemuVm::processRequest(const char* req){
   write(req);
-  return readAll();  
+  return readAll();
 }
 
 response qemuVm::processRequest_timed(const char* req,QTime& t){
@@ -122,5 +89,4 @@ response qemuVm::processRequest_timed(const char* req,QTime& t){
   }
   return resp;
 }
-
 

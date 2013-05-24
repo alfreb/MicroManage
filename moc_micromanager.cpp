@@ -1,16 +1,17 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'main.cpp'
+** Meta object code from reading C++ file 'micromanager.h'
 **
-** Created: Tue May 21 18:03:12 2013
-**      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
+** Created: Fri May 24 14:41:53 2013
+**      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include "micromanager.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'main.cpp' doesn't include <QObject>."
+#error "The header file 'micromanager.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
-#error "This file was generated using the moc from 4.8.1. It"
+#error "This file was generated using the moc from 4.8.4. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -22,7 +23,7 @@ static const uint qt_meta_data_microManager[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       8,   14, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -35,20 +36,13 @@ static const uint qt_meta_data_microManager[] = {
 
  // slots: signature, parameters, type, tag, flags
       33,   13,   13,   13, 0x0a,
-      45,   13,   13,   13, 0x0a,
-      66,   13,   13,   13, 0x0a,
-      98,   96,   13,   13, 0x0a,
-     109,   13,   13,   13, 0x0a,
-     125,   13,   13,   13, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_microManager[] = {
     "microManager\0\0allBooted()\0exit()\0"
-    "afterBoot()\0menu_vmInteraction()\0"
-    "menu_time_n_random_requests()\0n\0"
-    "bootN(int)\0menu_bootMore()\0bootAll()\0"
+    "userPrompt()\0"
 };
 
 void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -59,15 +53,11 @@ void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         switch (_id) {
         case 0: _t->allBooted(); break;
         case 1: _t->exit(); break;
-        case 2: _t->afterBoot(); break;
-        case 3: _t->menu_vmInteraction(); break;
-        case 4: _t->menu_time_n_random_requests(); break;
-        case 5: _t->bootN((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->menu_bootMore(); break;
-        case 7: _t->bootAll(); break;
+        case 2: _t->userPrompt(); break;
         default: ;
         }
     }
+    Q_UNUSED(_a);
 }
 
 const QMetaObjectExtraData microManager::staticMetaObjectExtraData = {
@@ -102,9 +92,9 @@ int microManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 3)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 3;
     }
     return _id;
 }

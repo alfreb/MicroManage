@@ -15,4 +15,13 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    micromachine.cpp \
+    qemuvm.cpp \
+    micromanager.cpp
+
+HEADERS += \
+    micromachine.h \
+    qemuvm.h \
+    micromanager.h
+
