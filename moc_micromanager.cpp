@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'micromanager.h'
 **
-** Created: Fri May 24 15:55:55 2013
+** Created: Sun May 26 13:53:49 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,26 +23,29 @@ static const uint qt_meta_data_microManager[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       2,       // signalCount
+       3,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
       14,   13,   13,   13, 0x05,
-      26,   13,   13,   13, 0x05,
+      27,   13,   13,   13, 0x05,
+      46,   13,   13,   13, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      33,   13,   13,   13, 0x0a,
+      53,   13,   13,   13, 0x0a,
+      66,   13,   13,   13, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_microManager[] = {
-    "microManager\0\0allBooted()\0exit()\0"
-    "userPrompt()\0"
+    "microManager\0\0allStarted()\0"
+    "bootConfirmedAll()\0exit()\0userPrompt()\0"
+    "bootConfirmed()\0"
 };
 
 void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -51,9 +54,11 @@ void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         Q_ASSERT(staticMetaObject.cast(_o));
         microManager *_t = static_cast<microManager *>(_o);
         switch (_id) {
-        case 0: _t->allBooted(); break;
-        case 1: _t->exit(); break;
-        case 2: _t->userPrompt(); break;
+        case 0: _t->allStarted(); break;
+        case 1: _t->bootConfirmedAll(); break;
+        case 2: _t->exit(); break;
+        case 3: _t->userPrompt(); break;
+        case 4: _t->bootConfirmed(); break;
         default: ;
         }
     }
@@ -92,22 +97,28 @@ int microManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 5;
     }
     return _id;
 }
 
 // SIGNAL 0
-void microManager::allBooted()
+void microManager::allStarted()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 
 // SIGNAL 1
-void microManager::exit()
+void microManager::bootConfirmedAll()
 {
     QMetaObject::activate(this, &staticMetaObject, 1, 0);
+}
+
+// SIGNAL 2
+void microManager::exit()
+{
+    QMetaObject::activate(this, &staticMetaObject, 2, 0);
 }
 QT_END_MOC_NAMESPACE

@@ -11,6 +11,10 @@ class microManager : public QObject
 
     QTime t;
     std::vector<qemuVm*> vms;
+    int vmsBooted;
+    int pctBooted;
+    int progStep;
+
 
 public:
     explicit microManager(QObject *parent = 0);
@@ -29,11 +33,14 @@ public:
 
 
 signals:
-    void allBooted();
+    void allStarted();
+    void bootConfirmedAll(); //Connect to user prompt
     void exit();
 
 public slots:
      void userPrompt();
+     void bootConfirmed(); //One VM confirmed boot
+     //void bootConfirmedAll();
      //void init();
 
 };

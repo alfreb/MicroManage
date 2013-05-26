@@ -5,8 +5,9 @@
 using namespace std;
 
 microManager::microManager(QObject *parent) :
-    QObject(parent)
+    QObject(parent),vmsBooted(0),pctBooted(0),progStep(0)
 {
+    connect(this,SIGNAL(bootConfirmedAll()),this,SLOT(userPrompt()));
 }
 
 microManager::~microManager(){
@@ -17,6 +18,7 @@ microManager::~microManager(){
         //No need to delete the objects - it will take forever and we're exiting anyway.
         //delete(*it);
     }
+
 }
 
 void microManager::menu_main(int vmCount){
@@ -36,7 +38,7 @@ void microManager::menu_main(int vmCount){
 void microManager::userPrompt(){
     std::string input="";
 
-    while(true){
+   // while(true){
 
         menu_main(vms.size());
 
@@ -57,7 +59,7 @@ void microManager::userPrompt(){
             emit exit();
             return;
         }
-    }
+    //}
 }
 
 
@@ -109,10 +111,12 @@ void microManager::menu_time_n_random_requests(){
 
 void microManager::bootN(int n){
     qemuVm* vm;
+    pctBooted=0;
     for(int i=0;i<n; i++){
         vm=new qemuVm;
-        vm->boot();
+        vm->boot();        
         vms.push_back(vm);
+        connect(vm,SIGNAL(bootConfirmed()),this,SLOT(bootConfirmed()));
     }
     //vmCount=vms.size();
 }
@@ -132,5 +136,32 @@ void microManager::menu_bootMore(){
 }
 
 
+void microManager::bootConfirmed(){
+    //cout << "vmsBooted: " << vmsBooted << endl;
+    int progWidth=50;
+    if(++vmsBooted >= vms.size()){
+        emit bootConfirmedAll();
+        cout << "All VM's booted!" << endl;
+    }else{
+
+        float pct=(float(vmsBooted)/float(vms.size()))*progWidth;
+        float increase=pct - pctBooted;
+
+        if(increase >= 5){
+            cout << "\r 0% |";
+            for(int i=0;i<progWidth;i++){
+                if(i<=pct)
+                    cout << "=";
+                else
+                    cout << " ";
+            }
+            //cout.flush();
+            cout << "| 100%";
+            //cout << progString.c_str();
+            pctBooted=pct;
+        }
+
+    }
+}
 
 

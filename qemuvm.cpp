@@ -1,12 +1,12 @@
 #include "qemuvm.h"
 #include "QDebug"
-
+#include <iostream>
 /*
   Statics
 
  */
 
-QString qemuVm::command="qemu-system-i386";
+QString qemuVm::command="qemu-system-i386";//"./qemu_dummy";
 
 QStringList cmd_args(){
   QStringList args;
@@ -97,11 +97,14 @@ response qemuVm::processRequest_timed(const char* req,QTime& t){
 
 void qemuVm::firstByteRecieved(){
     QByteArray data=proc.readAll();
-    if(data[0]==boot_char){
-        qDebug()<<"Boot confirmed: vm "<< this->numericId;
+    if(isBooted==0 and data[0]==boot_char){
+        //std::cout <<"Boot confirmed: vm "<< this->numericId << std::endl;
         this->isBooted=true;
         emit bootConfirmed();
+        QObject::disconnect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+    }else if(isBooted==0){
+        std::cout <<"Unexpected process output: " << std::string(data).c_str() << std::endl;
     }else{
-        qDebug()<<"Unexpected process output: " << data;
+        //There was data from the process. Save?
     }
 }
