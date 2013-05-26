@@ -52,7 +52,7 @@ protected:
   explicit microMachine(QObject *parent = 0);
     
 signals:
-  void bootConfirmed();
+  //void bootConfirmed(microMachine* p);
     
 public slots:
 

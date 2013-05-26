@@ -39,7 +39,7 @@ signals:
 
 public slots:
      void userPrompt();
-     void bootConfirmed(); //One VM confirmed boot
+     void bootConfirmed(qemuVm *p); //One VM confirmed boot
      //void bootConfirmedAll();
      //void init();
 

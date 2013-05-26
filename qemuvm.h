@@ -26,6 +26,9 @@ public:
     virtual response processRequest(const char* req);
     virtual response processRequest_timed(const char* req,QTime& t);
 
+signals:
+    void bootConfirmed(qemuVm *p);
+
 public slots:
   void firstByteRecieved();
 

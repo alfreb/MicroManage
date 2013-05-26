@@ -100,7 +100,7 @@ void qemuVm::firstByteRecieved(){
     if(isBooted==0 and data[0]==boot_char){
         //std::cout <<"Boot confirmed: vm "<< this->numericId << std::endl;
         this->isBooted=true;
-        emit bootConfirmed();
+        emit bootConfirmed(this);
         QObject::disconnect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
     }else if(isBooted==0){
         std::cout <<"Unexpected process output: " << std::string(data).c_str() << std::endl;

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qemuvm.h'
 **
-** Created: Sun May 26 09:14:09 2013
+** Created: Sun May 26 15:12:30 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,21 +23,25 @@ static const uint qt_meta_data_qemuVm[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       1,       // signalCount
+
+ // signals: signature, parameters, type, tag, flags
+      10,    8,    7,    7, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-       8,    7,    7,    7, 0x0a,
+      33,    7,    7,    7, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_qemuVm[] = {
-    "qemuVm\0\0firstByteRecieved()\0"
+    "qemuVm\0\0p\0bootConfirmed(qemuVm*)\0"
+    "firstByteRecieved()\0"
 };
 
 void qemuVm::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -46,11 +50,11 @@ void qemuVm::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         Q_ASSERT(staticMetaObject.cast(_o));
         qemuVm *_t = static_cast<qemuVm *>(_o);
         switch (_id) {
-        case 0: _t->firstByteRecieved(); break;
+        case 0: _t->bootConfirmed((*reinterpret_cast< qemuVm*(*)>(_a[1]))); break;
+        case 1: _t->firstByteRecieved(); break;
         default: ;
         }
     }
-    Q_UNUSED(_a);
 }
 
 const QMetaObjectExtraData qemuVm::staticMetaObjectExtraData = {
@@ -85,10 +89,17 @@ int qemuVm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 2;
     }
     return _id;
+}
+
+// SIGNAL 0
+void qemuVm::bootConfirmed(qemuVm * _t1)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_END_MOC_NAMESPACE

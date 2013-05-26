@@ -136,7 +136,8 @@ void microManager::menu_bootMore(){
 }
 
 
-void microManager::bootConfirmed(){
+void microManager::bootConfirmed(qemuVm* p){
+    disconnect(p,SIGNAL(bootConfirmed(qemuVm*)),this,SLOT(bootConfirmed(qemuVm*)));
     //cout << "vmsBooted: " << vmsBooted << endl;
     int progWidth=50;
     if(++vmsBooted >= vms.size()){
