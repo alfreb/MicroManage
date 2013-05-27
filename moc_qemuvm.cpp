@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qemuvm.h'
 **
-** Created: Sun May 26 15:18:32 2013
+** Created: Mon May 27 13:49:21 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -31,16 +31,16 @@ static const uint qt_meta_data_qemuVm[] = {
        1,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
-      10,    8,    7,    7, 0x05,
+       8,    7,    7,    7, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      33,    7,    7,    7, 0x0a,
+      31,    7,    7,    7, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_qemuVm[] = {
-    "qemuVm\0\0p\0bootConfirmed(qemuVm*)\0"
+    "qemuVm\0\0bootConfirmed(qemuVm*)\0"
     "firstByteRecieved()\0"
 };
 

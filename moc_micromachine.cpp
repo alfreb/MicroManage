@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'micromachine.h'
 **
-** Created: Sun May 26 15:18:32 2013
+** Created: Mon May 27 13:49:20 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!

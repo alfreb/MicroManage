@@ -6,7 +6,7 @@
 
  */
 
-QString qemuVm::command="qemu-system-i386";//"./qemu_dummy";
+QString qemuVm::command="./qemu_dummy";//"qemu-system-i386";//
 
 QStringList cmd_args(){
   QStringList args;
@@ -22,7 +22,7 @@ QStringList qemuVm::args=cmd_args();
 */
 qemuVm::qemuVm() :
     microMachine(),boot_char('!') {
-    QObject::connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+    //connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
 }
 
 /*
@@ -97,11 +97,12 @@ response qemuVm::processRequest_timed(const char* req,QTime& t){
 
 void qemuVm::firstByteRecieved(){
     QByteArray data=proc.readAll();
+    //proc.state()
     if(isBooted==0 and data[0]==boot_char){
         //std::cout <<"Boot confirmed: vm "<< this->numericId << std::endl;
         this->isBooted=true;
-        emit bootConfirmed(this);
-        QObject::disconnect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+        //disconnect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+        //emit bootConfirmed(this);
     }else if(isBooted==0){
         std::cout <<"Unexpected process output: " << std::string(data).c_str() << std::endl;
     }else{

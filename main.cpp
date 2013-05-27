@@ -12,8 +12,9 @@
 //#include "class_microMachine.cpp"
 //#include "simulation_menu.h"
 
-#include "micromanager.h"
-#include "qemuvm.h"
+//#include "micromanager.h"
+//#include "qemuvm.h"
+#include "qprocessmanager_simple.h"
 
 using namespace std;
 
@@ -29,19 +30,16 @@ int main(int argc, char *argv[])
   
   QCoreApplication a(argc, argv);
 
-  int vmCount(0);
+  //microManager* manager=new microManager(&a);
+  qprocessManager_simple* manager=new qprocessManager_simple(&a);
 
-  if(argc>1)
-    vmCount=atoi(argv[1]);
-
-  microManager* manager=new microManager(&a);
-
+    /*
   QObject::connect(manager,SIGNAL(exit()), &a,SLOT(quit()));
   //QObject::connect(manager,SIGNAL(allBooted()),manager,SLOT(afterBoot()));
   //Put the manager into the event-loop
   QTimer::singleShot(0,manager,SLOT(userPrompt()));
-
-  return a.exec();
+*/
+ return a.exec();
   
 
 }

@@ -116,7 +116,7 @@ void microManager::bootN(int n){
         vm=new qemuVm;
         vm->boot();        
         vms.push_back(vm);
-        connect(vm,SIGNAL(bootConfirmed(qemuVm* v)),this,SLOT(bootConfirmed(qemuVm* v)));
+        //connect(vm,SIGNAL(bootConfirmed(qemuVm*)),this,SLOT(bootConfirmed(qemuVm*)));
     }
     //vmCount=vms.size();
 }
