@@ -22,8 +22,8 @@ public:
     virtual void halt();
     virtual QString readAll();
     virtual void write(const char* s);
-    virtual response processRequest(const char* req);
-    virtual response processRequest_timed(const char* req,QTime& t);
+    virtual void processRequest(const char* req);
+    virtual void processRequest_timed(const char* req,QTime& t);
 
 signals:
     void bootConfirmed(qemuVm_popen*);

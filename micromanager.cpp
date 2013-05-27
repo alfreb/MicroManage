@@ -5,9 +5,10 @@
 using namespace std;
 
 microManager::microManager(QObject *parent) :
-    QObject(parent),vmsBooted(0),pctBooted(0),progStep(0)
+    QObject(parent),vmsBooted(0),pctBooted(0),progStep(0),samplesOrdered(0),sum_sampleTimes(0)
 {
-    connect(this,SIGNAL(bootConfirmedAll()),this,SLOT(userPrompt()));
+    connect(this,SIGNAL(menuItemComplete()),this,SLOT(userPrompt()));
+
 }
 
 microManager::~microManager(){
@@ -29,29 +30,38 @@ void microManager::menu_main(int vmCount){
          << vmCount << " VM's currently booted" << endl
          << endl
          << "1 : Interact with a VM "<< endl
-         << "2 : Boot more VM's "<< endl
-         << "3 : Sample random response times"<< endl
+         << "2 : Boot n VM's "<< endl
+         << "3 : Shutdown n VM's"<< endl
+         << "4 : Sample random response times"<< endl
          << "q : Quit "<< endl
          << endl;
+
 }
 
 void microManager::userPrompt(){
     std::string input="";
 
-   // while(true){
+    // while(true){
 
         menu_main(vms.size());
 
-        cin >> input;
+        int reqs(0);
+        while(input.size()<1){
+            cout << endl << ++reqs << " microManage$ ";
+            std::getline(cin,input);
+        }
 
         switch(QString(input.c_str()).at(0).toLower().toLatin1()){
         case '1':
             menu_vmInteraction();
             break;
         case '2':
-            menu_bootMore();
+            menu_boot_n();
             break;
         case '3':
+            menu_shutdown_n();
+            break;
+        case '4':
             menu_time_n_random_requests();
             break;
         case 'q':
@@ -67,67 +77,133 @@ void microManager::menu_vmInteraction(){
     response data;
     int vmNr(0);
     qemuVm_qprocess* vm(0);
-    char req='a';
+    string req="a";
 
     cout << endl << "Enter vm id: ";
     cin >> vmNr;
     if(vmNr>=0 and vmNr<vms.size()){
         vm=vms[vmNr];
         cout << "Enter a single character request" << endl;
-        cin >> req;
-        connect(vm,SIGNAL(requestHandled(QByteArray*)),this,SLOT(requestHandled(QByteArray*)));
-        vm->processRequest_timed(string(&req).c_str(),t);
+        cin >> req;        
+        timedRequest(vm,req);
     }else{
         cout << "Invalid ID. Type a number between 0 and " << vms.size() << endl;
+        emit this->menuItemComplete();
     }
+    //
+}
+
+void microManager::timedRequest(qemuVm_qprocess *vm,std::string req){
+
+    vmsRequested.push_back(vm);
+
+    qDebug()<<"Requesting VM " << vm->id();
+    connect(vm,SIGNAL(timedRequestHandled(qemuVm_qprocess*,int)),this,SLOT(timedRequestHandled(qemuVm_qprocess*,int)));
+    vm->processRequest_timed(req);
+
 }
 
 void microManager::menu_time_n_random_requests(){
     int sampleCount(0);
     int vmNr(0);
+
+    Q_ASSERT(vmsRequested.size()==0);
+
     qemuVm_qprocess* vm(0);
     QString data;
 
     cout << endl << "How many samples? " << endl;
     cin >> sampleCount;
 
-    int timeTotal(0);
-
-    for(int i=0;i<sampleCount; i++){
-        vmNr=rand() % vms.size();
-        vm=vms[vmNr];
-        data=vm->processRequest_timed("a",t);
-        qDebug()<< "VM nr. " << vmNr<< "Response: " << data
-                << " response time: " << vm->lastResponseTime()
-                << " QoS: " << vm->qos();
-        timeTotal+=vm->lastResponseTime();
+    while(sampleCount>vms.size()){
+        cout << "Please enter a sample size smaller than "<< vms.size()<< "(the number of VM's) ";
+        cin >> sampleCount;
     }
+
+    cout << "------------------------------------------------------------------" << endl;
+    cout << "Sampling QoS from " << sampleCount << " randomly selected vm's" << endl;
+    cout << "------------------------------------------------------------------" << endl;
+    this->samplesOrdered=sampleCount;
+    this->sum_sampleTimes=0;
+
+    for(int i=0;i<samplesOrdered; i++){
+
+        //Randomly draw vms that are not allready being requested
+        do{
+            vmNr=rand() % vms.size();
+        }while(find(vmsRequested.begin(),vmsRequested.end(),vms[vmNr])!=vmsRequested.end());
+
+        timedRequest(vms[vmNr],"a");
+    }
+    /*
     cout << endl << "Average response time over "
          << sampleCount << " samples: " << float(timeTotal)/float(sampleCount) << " ms."
-         << endl;
+         << endl;*/
 }
 
-void microManager::bootN(int n){
+void microManager::boot_n(int n){
     qemuVm_qprocess* vm;
-    pctBooted=0;
+    //pctBooted=0;
     for(int i=0;i<n; i++){
         vm=new qemuVm_qprocess(this);
         vm->boot();        
         vms.push_back(vm);
         connect(vm,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
+        //connect(vm,SIGNAL(requestHandled(qemuVm_qprocess*, QByteArray)),this,SLOT(requestHandled(qemuVm_qprocess*,QByteArray)));
     }
     //vmCount=vms.size();
 }
 
+void microManager::shutdown_n(int n){
+    qDebug()<<"Shutting down "<< n << " vm's";
+    if(n>=vms.size()){
+        n=vms.size()-1;
+    }
 
-void microManager::menu_bootMore(){
+    qemuVm_qprocess* vm;
+    for(int i=0;i<n; i++){
+        vm=vms.back();
+        qDebug()<<"shutting down Vm " << vm->id();
+
+        vms.pop_back();
+        vm->halt();
+
+        //vm->deleteLater();
+        //disconnect(vm,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
+        //connect(vm,SIGNAL(requestHandled(qemuVm_qprocess*, QByteArray)),this,SLOT(requestHandled(qemuVm_qprocess*,QByteArray)));
+    }
+
+    emit this->menuItemComplete();
+}
+
+void microManager::menu_shutdown_n(){
+    cout << "Sorry, not yet implemented" << endl;
+    emit this->menuItemComplete();
+    return;
+
     int count(0);
-    cout << endl << "How many more? ";
+    cout << endl << "How many do you want to shut down? ";
     cin>>count;
 
-    cout << "Booting " << count << " more machines" << endl;
+    if(count>vms.size()){
+        cout << "Can't do that, "<<vms.size()<< " vms are booted.";
+
+    }else{
+        cout << "Terminating (stopping and then deleting remains) " << count << " vm's" << endl;
+        shutdown_n(count);
+    }
+
+
+}
+
+void microManager::menu_boot_n(){
+    int count(0);
+    cout << endl << "How many do you want to boot? ";
+    cin>>count;
+
+    cout << "Booting " << count << "  machines" << endl;
     try{
-        bootN(count);
+        boot_n(count);
     }catch(string s){
         cout << "Error during boot: " << s.c_str() << endl;
     }
@@ -139,8 +215,9 @@ void microManager::bootConfirmed(qemuVm_qprocess* p){
     //cout << "vmsBooted: " << vmsBooted << endl;
     int progWidth=50;
     if(++vmsBooted >= vms.size()){
-        cout << "All VM's booted!" << endl;
-        emit bootConfirmedAll();
+
+        emit menuItemComplete();
+        return;
     }else{
 
         float pct=(float(vmsBooted)/float(vms.size()))*progWidth;
@@ -162,6 +239,32 @@ void microManager::bootConfirmed(qemuVm_qprocess* p){
         }
 
     }
+}
+
+void microManager::timedRequestHandled(qemuVm_qprocess * p, int t){
+    //qDebug()<< " Response from vm " << p->id() << ", que size: " << vmsRequested.size();
+
+    vector<qemuVm_qprocess*>::iterator it=find(vmsRequested.begin(),vmsRequested.end(),p);
+
+    //FAILS: Q_ASSERT(it!=vmsRequested.end()); WHY?
+    //IF we are expecting a response from this one:
+    if(it!=vmsRequested.end()){
+        if(samplesOrdered>0)
+            sum_sampleTimes+=t;
+        vmsRequested.erase(it);
+    }
+
+    if(vmsRequested.size()==0){
+        if(samplesOrdered>0){
+            cout << "------------------------------------------------------------------" << endl;
+            float result=float(sum_sampleTimes)/float(samplesOrdered);
+            cout << result << " average response time over " << samplesOrdered << " samples" << endl;
+            cout << "With " << vms.size() << " vm's running " << endl;
+            cout << "------------------------------------------------------------------" << endl;
+        }
+        emit menuItemComplete();
+    }
+
 }
 
 

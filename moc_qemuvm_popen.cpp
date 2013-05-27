@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qemuvm_popen.h'
 **
-** Created: Mon May 27 15:24:49 2013
+** Created: Mon May 27 18:00:04 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -28,12 +28,12 @@ void qemuVm_popen::write(const char *s){
     fputs(s,proc);
 }
 
-response qemuVm_popen::processRequest(const char* req){
-    return response("Not implemented");
+void qemuVm_popen::processRequest(const char* req){
+   // return response("Not implemented");
 }
 
-response qemuVm_popen::processRequest_timed(const char* req,QTime& t){
-    return response("Not implemented");
+void qemuVm_popen::processRequest_timed(const char* req,QTime& t){
+   // return response("Not implemented");
 }
 
 void qemuVm_popen::firstByteRecieved(){

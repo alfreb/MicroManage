@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'micromanager.h'
 **
-** Created: Mon May 27 14:47:44 2013
+** Created: Mon May 27 22:57:42 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,29 +23,32 @@ static const uint qt_meta_data_microManager[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       3,       // signalCount
+       4,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
       14,   13,   13,   13, 0x05,
       27,   13,   13,   13, 0x05,
       46,   13,   13,   13, 0x05,
+      65,   13,   13,   13, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      53,   13,   13,   13, 0x0a,
-      68,   66,   13,   13, 0x0a,
+      72,   13,   13,   13, 0x0a,
+      85,   13,   13,   13, 0x0a,
+     119,  117,   13,   13, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_microManager[] = {
     "microManager\0\0allStarted()\0"
-    "bootConfirmedAll()\0exit()\0userPrompt()\0"
-    "p\0bootConfirmed(qemuVm_qprocess*)\0"
+    "bootConfirmedAll()\0menuItemComplete()\0"
+    "exit()\0userPrompt()\0bootConfirmed(qemuVm_qprocess*)\0"
+    ",\0timedRequestHandled(qemuVm_qprocess*,int)\0"
 };
 
 void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -56,9 +59,11 @@ void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         switch (_id) {
         case 0: _t->allStarted(); break;
         case 1: _t->bootConfirmedAll(); break;
-        case 2: _t->exit(); break;
-        case 3: _t->userPrompt(); break;
-        case 4: _t->bootConfirmed((*reinterpret_cast< qemuVm_qprocess*(*)>(_a[1]))); break;
+        case 2: _t->menuItemComplete(); break;
+        case 3: _t->exit(); break;
+        case 4: _t->userPrompt(); break;
+        case 5: _t->bootConfirmed((*reinterpret_cast< qemuVm_qprocess*(*)>(_a[1]))); break;
+        case 6: _t->timedRequestHandled((*reinterpret_cast< qemuVm_qprocess*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;
         }
     }
@@ -96,9 +101,9 @@ int microManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 7;
     }
     return _id;
 }
@@ -116,8 +121,14 @@ void microManager::bootConfirmedAll()
 }
 
 // SIGNAL 2
-void microManager::exit()
+void microManager::menuItemComplete()
 {
     QMetaObject::activate(this, &staticMetaObject, 2, 0);
+}
+
+// SIGNAL 3
+void microManager::exit()
+{
+    QMetaObject::activate(this, &staticMetaObject, 3, 0);
 }
 QT_END_MOC_NAMESPACE

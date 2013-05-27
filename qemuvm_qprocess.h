@@ -16,7 +16,7 @@ class qemuVm_qprocess : public microMachine
         - Should only be created when needed
         - Should be destroyed when not in use
      */
-    QTime* t;
+    QTime* timer;
 
     //The first character output by VM after boot
     const char boot_char;
@@ -26,19 +26,22 @@ public:
     ~qemuVm_qprocess();
 
     virtual void boot();
-    virtual void halt();
+    virtual void halt();    
     virtual QString readAll();
-    virtual void write(const char* s);
-    virtual void processRequest(const char* req);
-    virtual void processRequest_timed(const char* req,QTime& t);
+    virtual void write(std::string s);
+    virtual void processRequest(std::string req);
+    virtual void processRequest_timed(std::string req);
+
+    //Halt, and delete self when process is stopped
+    void halt_controlled();
 
 signals:
     void bootConfirmed(qemuVm_qprocess*);
-    void requestHandled(QByteArray*);
+    void timedRequestHandled(qemuVm_qprocess*, int);
 
 public slots:
   void firstByteRecieved();
-  void timedRequestReady();
+  void timedRequestDone();
 
 };
 

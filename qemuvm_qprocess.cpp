@@ -23,7 +23,7 @@ QStringList qemuVm_qprocess::args=cmd_args();
   Construct / Destruct
 */
 qemuVm_qprocess::qemuVm_qprocess(QObject *parent) :
-    microMachine(),boot_char('!'),proc(this) {
+    microMachine(),boot_char('!'),proc(this),timer(0) {
     connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
 }
 
@@ -52,6 +52,10 @@ void qemuVm_qprocess::halt(){
   proc.kill();
 }
 
+void qemuVm_qprocess::halt_controlled(){
+  proc.kill();
+  connect(&proc,SIGNAL(finished(int)),this,SLOT(deleteLater()));
+}
 
 
 /*
@@ -63,7 +67,7 @@ QString qemuVm_qprocess::readAll(){
   return QString(proc.readAll().constData());
 }
 
-void qemuVm_qprocess::write(const char* s){
+void qemuVm_qprocess::write(std::string s){
   if(isBooted==0){
       /*
     qDebug()<<"Waiting for vm to boot...";
@@ -74,19 +78,20 @@ void qemuVm_qprocess::write(const char* s){
       qDebug()<<"VM has not yet confirmed boot. Try again later.";
       return;
   }
-  proc.write(s);
+  proc.write(s.c_str());
 }
 
-response qemuVm_qprocess::processRequest(const char* req){
+void qemuVm_qprocess::processRequest(std::string req){
+  connect(&proc,SIGNAL(readyRead()),this,SLOT(timedRequestDone()));
   write(req);
-  return readAll();
+  //return readAll();
 }
 
-void qemuVm_qprocess::processRequest_timed(const char* req,QTime& t){
-  t.start();
+void qemuVm_qprocess::processRequest_timed(std::string req){
+  connect(&proc,SIGNAL(readyRead()),this,SLOT(timedRequestDone()));
+  timer=new QTime;
+  timer->start();
   write(req);
-
-
 }
 
 void qemuVm_qprocess::firstByteRecieved(){
@@ -105,7 +110,16 @@ void qemuVm_qprocess::firstByteRecieved(){
     }
 }
 
-void qemuVm_qprocess::timedRequestReady(){
-    QString resp=readAll();
-
+void qemuVm_qprocess::timedRequestDone(){
+    QByteArray data=proc.readAll();
+    int t=-1;
+    if(timer){
+        t=timer->elapsed();
+        this->lastResponseTime_ms=t;
+        qDebug()<< "Response from VM " << this->id() << " : " << data << " Timed to " << t << " ms.";
+        delete timer;
+        timer=0;
+    }
+    disconnect(&proc,SIGNAL(readyRead()),this,SLOT(timedRequestDone()));
+    emit this->timedRequestHandled(this,t);
 }

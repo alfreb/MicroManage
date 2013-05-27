@@ -36,9 +36,9 @@ protected:
 
   //Communication
   virtual QString readAll()=0;
-  virtual void write(const char* s)=0;
-  virtual void processRequest(const char* req)=0;
-  virtual void processRequest_timed(const char* req,QTime& t)=0;
+  virtual void write(std::string s)=0;
+  virtual void processRequest(std::string req)=0;
+  virtual void processRequest_timed(std::string req)=0;
 
   //Getters
   QString name();

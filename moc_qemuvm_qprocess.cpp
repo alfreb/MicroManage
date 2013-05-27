@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qemuvm_qprocess.h'
 **
-** Created: Mon May 27 14:47:44 2013
+** Created: Mon May 27 22:42:50 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,25 +23,28 @@ static const uint qt_meta_data_qemuVm_qprocess[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+       4,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       1,       // signalCount
+       2,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
       17,   16,   16,   16, 0x05,
+      51,   49,   16,   16, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      49,   16,   16,   16, 0x0a,
+      93,   16,   16,   16, 0x0a,
+     113,   16,   16,   16, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_qemuVm_qprocess[] = {
     "qemuVm_qprocess\0\0bootConfirmed(qemuVm_qprocess*)\0"
-    "firstByteRecieved()\0"
+    ",\0timedRequestHandled(qemuVm_qprocess*,int)\0"
+    "firstByteRecieved()\0timedRequestDone()\0"
 };
 
 void qemuVm_qprocess::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -51,7 +54,9 @@ void qemuVm_qprocess::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         qemuVm_qprocess *_t = static_cast<qemuVm_qprocess *>(_o);
         switch (_id) {
         case 0: _t->bootConfirmed((*reinterpret_cast< qemuVm_qprocess*(*)>(_a[1]))); break;
-        case 1: _t->firstByteRecieved(); break;
+        case 1: _t->timedRequestHandled((*reinterpret_cast< qemuVm_qprocess*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: _t->firstByteRecieved(); break;
+        case 3: _t->timedRequestDone(); break;
         default: ;
         }
     }
@@ -89,9 +94,9 @@ int qemuVm_qprocess::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 2)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 2;
+        _id -= 4;
     }
     return _id;
 }
@@ -101,5 +106,12 @@ void qemuVm_qprocess::bootConfirmed(qemuVm_qprocess * _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void qemuVm_qprocess::timedRequestHandled(qemuVm_qprocess * _t1, int _t2)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_END_MOC_NAMESPACE
