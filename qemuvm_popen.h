@@ -1,23 +1,22 @@
-#ifndef QEMUVM_H
-#define QEMUVM_H
+#ifndef QEMUVM_POPEN_H
+#define QEMUVM_POPEN_H
 
 #include "micromachine.h"
-#include "QProcess"
 
-class qemuVm : public microMachine
+class qemuVm_popen : public microMachine
 {
     Q_OBJECT
 
-    QProcess proc;
-    static QString command;
-    static QStringList args;
+    FILE* proc;
+
+    char* command;
 
     //The first character output by VM after boot
     const char boot_char;
 
 public:
-    qemuVm(QObject *parent = 0);
-    ~qemuVm();
+    explicit qemuVm_popen(QObject* parent=0);
+    ~qemuVm_popen();
 
     virtual void boot();
     virtual void halt();
@@ -27,11 +26,12 @@ public:
     virtual response processRequest_timed(const char* req,QTime& t);
 
 signals:
-    void bootConfirmed(qemuVm*);
+    void bootConfirmed(qemuVm_popen*);
 
 public slots:
   void firstByteRecieved();
 
+
 };
 
-#endif // QEMUVM_H
+#endif // QEMUVM_POPEN_H

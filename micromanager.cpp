@@ -11,7 +11,7 @@ microManager::microManager(QObject *parent) :
 }
 
 microManager::~microManager(){
-    vector<qemuVm*>::iterator it;
+    vector<qemuVm_qprocess*>::iterator it;
     cout << "Killing all processes" << endl;
     for(it=vms.begin(); it!=vms.end(); it++){
         (*it)->halt();
@@ -66,7 +66,7 @@ void microManager::userPrompt(){
 void microManager::menu_vmInteraction(){
     response data;
     int vmNr(0);
-    qemuVm* vm(0);
+    qemuVm_qprocess* vm(0);
     char req='a';
 
     cout << endl << "Enter vm id: ";
@@ -75,10 +75,8 @@ void microManager::menu_vmInteraction(){
         vm=vms[vmNr];
         cout << "Enter a single character request" << endl;
         cin >> req;
-        data=vm->processRequest_timed(string(&req).c_str(),t);
-        qDebug() << "Response: " << data
-                 << " response time: " << vm->lastResponseTime()
-                 << " QoS: " << vm->qos();
+        connect(vm,SIGNAL(requestHandled(QByteArray*)),this,SLOT(requestHandled(QByteArray*)));
+        vm->processRequest_timed(string(&req).c_str(),t);
     }else{
         cout << "Invalid ID. Type a number between 0 and " << vms.size() << endl;
     }
@@ -87,7 +85,7 @@ void microManager::menu_vmInteraction(){
 void microManager::menu_time_n_random_requests(){
     int sampleCount(0);
     int vmNr(0);
-    qemuVm* vm(0);
+    qemuVm_qprocess* vm(0);
     QString data;
 
     cout << endl << "How many samples? " << endl;
@@ -110,13 +108,13 @@ void microManager::menu_time_n_random_requests(){
 }
 
 void microManager::bootN(int n){
-    qemuVm* vm;
+    qemuVm_qprocess* vm;
     pctBooted=0;
     for(int i=0;i<n; i++){
-        vm=new qemuVm(this);
+        vm=new qemuVm_qprocess(this);
         vm->boot();        
         vms.push_back(vm);
-        connect(vm,SIGNAL(bootConfirmed(qemuVm*)),this,SLOT(bootConfirmed(qemuVm*)));
+        connect(vm,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
     }
     //vmCount=vms.size();
 }
@@ -136,8 +134,8 @@ void microManager::menu_bootMore(){
 }
 
 
-void microManager::bootConfirmed(qemuVm* p){
-    disconnect(p,SIGNAL(bootConfirmed(qemuVm*)),this,SLOT(bootConfirmed(qemuVm*)));
+void microManager::bootConfirmed(qemuVm_qprocess* p){
+    disconnect(p,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
     //cout << "vmsBooted: " << vmsBooted << endl;
     int progWidth=50;
     if(++vmsBooted >= vms.size()){

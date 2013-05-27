@@ -17,13 +17,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     micromachine.cpp \
-    qemuvm.cpp \
     micromanager.cpp \
-    qprocessmanager_simple.cpp
+    qprocessmanager_simple.cpp \
+    qemuvm_qprocess.cpp \
+    qemuvm_popen.cpp
 
 HEADERS += \
     micromachine.h \
-    qemuvm.h \
     micromanager.h \
-    qprocessmanager_simple.h
+    qprocessmanager_simple.h \
+    qemuvm_qprocess.h \
+    qemuvm_popen.h
 

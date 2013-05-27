@@ -3,14 +3,14 @@
 
 #include <QObject>
 #include <vector>
-#include <qemuvm.h>
+#include <qemuvm_qprocess.h>
 
 class microManager : public QObject
 {
     Q_OBJECT
 
     QTime t;
-    std::vector<qemuVm*> vms;
+    std::vector<qemuVm_qprocess*> vms;
     int vmsBooted;
     int pctBooted;
     int progStep;
@@ -39,7 +39,8 @@ signals:
 
 public slots:
      void userPrompt();
-     void bootConfirmed(qemuVm *p); //One VM confirmed boot
+     void bootConfirmed(qemuVm_qprocess*); //One VM confirmed boot
+     void requestHandled(QByteArray*);
      //void bootConfirmedAll();
      //void init();
 

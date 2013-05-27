@@ -13,7 +13,7 @@
 //#include "simulation_menu.h"
 
 #include "micromanager.h"
-#include "qemuvm.h"
+//#include "qemuvm.h"
 //#include "qprocessmanager_simple.h"
 
 using namespace std;

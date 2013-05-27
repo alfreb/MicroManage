@@ -5,3 +5,4 @@
 *.xcodeproj
 *.user
 qemu_dummy
+popen_test

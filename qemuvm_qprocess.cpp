@@ -1,4 +1,4 @@
-#include "qemuvm.h"
+#include "qemuvm_qprocess.h"
 #include "QDebug"
 #include <iostream>
 /*
@@ -6,7 +6,9 @@
 
  */
 
-QString qemuVm::command="./qemu_dummy";//"qemu-system-i386";//
+
+QString qemuVm_qprocess::command="./qemu_dummy";
+//QString qemuVm::command="qemu-system-i386";
 
 QStringList cmd_args(){
   QStringList args;
@@ -15,12 +17,12 @@ QStringList cmd_args(){
   return args;
 }
 
-QStringList qemuVm::args=cmd_args();
+QStringList qemuVm_qprocess::args=cmd_args();
 
 /*
   Construct / Destruct
 */
-qemuVm::qemuVm(QObject *parent) :
+qemuVm_qprocess::qemuVm_qprocess(QObject *parent) :
     microMachine(),boot_char('!'),proc(this) {
     connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
 }
@@ -30,14 +32,14 @@ qemuVm::qemuVm(QString n) :
   microMachine(n){}
 */
 
-qemuVm::~qemuVm(){
+qemuVm_qprocess::~qemuVm_qprocess(){
   halt();
 }
 
 /*
   Start / Stop
 */
-void qemuVm::boot(){
+void qemuVm_qprocess::boot(){
   proc.start(command,args);
 
   //This is necessary if the command is not valid, i.e. on mac.
@@ -46,7 +48,7 @@ void qemuVm::boot(){
   }
 }
 
-void qemuVm::halt(){
+void qemuVm_qprocess::halt(){
   proc.kill();
 }
 
@@ -56,12 +58,12 @@ void qemuVm::halt(){
   VM Communication
 */
 
-QString qemuVm::readAll(){
-  proc.waitForReadyRead();
+QString qemuVm_qprocess::readAll(){
+  //proc.waitForReadyRead();
   return QString(proc.readAll().constData());
 }
 
-void qemuVm::write(const char* s){
+void qemuVm_qprocess::write(const char* s){
   if(isBooted==0){
       /*
     qDebug()<<"Waiting for vm to boot...";
@@ -72,30 +74,22 @@ void qemuVm::write(const char* s){
       qDebug()<<"VM has not yet confirmed boot. Try again later.";
       return;
   }
-
   proc.write(s);
 }
 
-response qemuVm::processRequest(const char* req){
+response qemuVm_qprocess::processRequest(const char* req){
   write(req);
   return readAll();
 }
 
-response qemuVm::processRequest_timed(const char* req,QTime& t){
+void qemuVm_qprocess::processRequest_timed(const char* req,QTime& t){
   t.start();
   write(req);
-  QString resp=readAll();
-  lastResponseTime_ms=t.elapsed();
-  if(lastResponseTime_ms<bestResponseTime_ms){
-    bestResponseTime_ms=lastResponseTime_ms;
-    currentQoS=10;
-  }else{
-    currentQoS=(float(bestResponseTime_ms)/float(lastResponseTime_ms))*10;
-  }
-  return resp;
+
+
 }
 
-void qemuVm::firstByteRecieved(){
+void qemuVm_qprocess::firstByteRecieved(){
     QByteArray data=proc.readAll();
     //proc.state()
     if(isBooted==0 and data[0]==boot_char){
@@ -106,6 +100,12 @@ void qemuVm::firstByteRecieved(){
     }else if(isBooted==0){
         std::cout <<"Unexpected process output: " << std::string(data).c_str() << std::endl;
     }else{
+        qDebug()<<"This should not happen - this signal is disconnected";
         //There was data from the process. Save?
     }
+}
+
+void qemuVm_qprocess::timedRequestReady(){
+    QString resp=readAll();
+
 }

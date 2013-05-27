@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'micromanager.h'
 **
-** Created: Mon May 27 14:32:08 2013
+** Created: Mon May 27 14:47:44 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -45,7 +45,7 @@ static const uint qt_meta_data_microManager[] = {
 static const char qt_meta_stringdata_microManager[] = {
     "microManager\0\0allStarted()\0"
     "bootConfirmedAll()\0exit()\0userPrompt()\0"
-    "p\0bootConfirmed(qemuVm*)\0"
+    "p\0bootConfirmed(qemuVm_qprocess*)\0"
 };
 
 void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -58,7 +58,7 @@ void microManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 1: _t->bootConfirmedAll(); break;
         case 2: _t->exit(); break;
         case 3: _t->userPrompt(); break;
-        case 4: _t->bootConfirmed((*reinterpret_cast< qemuVm*(*)>(_a[1]))); break;
+        case 4: _t->bootConfirmed((*reinterpret_cast< qemuVm_qprocess*(*)>(_a[1]))); break;
         default: ;
         }
     }

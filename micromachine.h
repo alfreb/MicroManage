@@ -37,8 +37,8 @@ protected:
   //Communication
   virtual QString readAll()=0;
   virtual void write(const char* s)=0;
-  virtual response processRequest(const char* req)=0;
-  virtual response processRequest_timed(const char* req,QTime& t)=0;
+  virtual void processRequest(const char* req)=0;
+  virtual void processRequest_timed(const char* req,QTime& t)=0;
 
   //Getters
   QString name();
@@ -53,6 +53,7 @@ protected:
     
 signals:
   //void bootConfirmed(microMachine* p);
+
     
 public slots:
 
