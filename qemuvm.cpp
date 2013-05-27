@@ -20,9 +20,9 @@ QStringList qemuVm::args=cmd_args();
 /*
   Construct / Destruct
 */
-qemuVm::qemuVm() :
-    microMachine(),boot_char('!') {
-    //connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+qemuVm::qemuVm(QObject *parent) :
+    microMachine(),boot_char('!'),proc(this) {
+    connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
 }
 
 /*
@@ -100,9 +100,9 @@ void qemuVm::firstByteRecieved(){
     //proc.state()
     if(isBooted==0 and data[0]==boot_char){
         //std::cout <<"Boot confirmed: vm "<< this->numericId << std::endl;
-        this->isBooted=true;
-        //disconnect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
-        //emit bootConfirmed(this);
+        isBooted=boot_char;
+        disconnect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+        emit bootConfirmed(this);
     }else if(isBooted==0){
         std::cout <<"Unexpected process output: " << std::string(data).c_str() << std::endl;
     }else{

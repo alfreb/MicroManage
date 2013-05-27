@@ -113,10 +113,10 @@ void microManager::bootN(int n){
     qemuVm* vm;
     pctBooted=0;
     for(int i=0;i<n; i++){
-        vm=new qemuVm;
+        vm=new qemuVm(this);
         vm->boot();        
         vms.push_back(vm);
-        //connect(vm,SIGNAL(bootConfirmed(qemuVm*)),this,SLOT(bootConfirmed(qemuVm*)));
+        connect(vm,SIGNAL(bootConfirmed(qemuVm*)),this,SLOT(bootConfirmed(qemuVm*)));
     }
     //vmCount=vms.size();
 }
@@ -141,8 +141,8 @@ void microManager::bootConfirmed(qemuVm* p){
     //cout << "vmsBooted: " << vmsBooted << endl;
     int progWidth=50;
     if(++vmsBooted >= vms.size()){
-        emit bootConfirmedAll();
         cout << "All VM's booted!" << endl;
+        emit bootConfirmedAll();
     }else{
 
         float pct=(float(vmsBooted)/float(vms.size()))*progWidth;
@@ -156,8 +156,9 @@ void microManager::bootConfirmed(qemuVm* p){
                 else
                     cout << " ";
             }
-            //cout.flush();
+
             cout << "| 100%";
+            cout.flush();
             //cout << progString.c_str();
             pctBooted=pct;
         }

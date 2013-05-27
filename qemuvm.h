@@ -16,7 +16,7 @@ class qemuVm : public microMachine
     const char boot_char;
 
 public:
-    qemuVm();
+    qemuVm(QObject *parent = 0);
     ~qemuVm();
 
     virtual void boot();
