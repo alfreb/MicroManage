@@ -216,8 +216,9 @@ void microManager::bootConfirmed(qemuVm_qprocess* p){
     int progWidth=50;
     if(++vmsBooted >= vms.size()){
 
-       // emit menuItemComplete();
-        qDebug()<< " All booted! " << endl;
+       qDebug()<< " All booted! " << endl;
+       emit menuItemComplete();
+
 
     }else{
 
