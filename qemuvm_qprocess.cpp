@@ -1,12 +1,14 @@
 #include "qemuvm_qprocess.h"
 #include "QDebug"
 #include <iostream>
+#include <vector>
 
 #ifndef __MACH__
 //LINUX-specific, for CPU core control
 #include <sched.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 #endif
 
 //#define _GNU_SOURCE
@@ -17,10 +19,12 @@
 
 
 //QString qemuVm_qprocess::command="./qemu_dummy";
-QString qemuVm_qprocess::command="qemu-system-i386";
+//QString qemuVm_qprocess::command="qemu-system-i386";
+QString qemuVm_qprocess::command="taskset";
 
 QStringList cmd_args(){
   QStringList args;
+  args << "-c"<< "19-24"<<"qemu-system-i386";
   args << "-hda" << "../microMachines_experimental_clean/microMachine.hda";
   args << "--nographic";
   return args;
@@ -75,19 +79,19 @@ void qemuVm_qprocess::halt_controlled(){
 /*
     CPU Control - Linux only
 */
-void qemuVm_qprocess::assignToCores(std::vector<int> cores)
+void qemuVm_qprocess::assignToCores(std::vector<int> &cores)
 {
-    proc.
+
 
 #ifndef __MACH__
-  pid_t pid=getpid();
+  
   cpu_set_t my_set;        /* Define your cpu_set bit mask. */
   CPU_ZERO(&my_set);       /* Initialize it all to 0, i.e. no CPUs selected. */
 
-  vector<int>::iterator it;
+  std::vector<int>::iterator it;
   for(it=cores.begin(); it!=cores.end(); ++it)
     CPU_SET(*it, &my_set);     /* set the bit that represents core 7. */
-  sched_setaffinity(pid, sizeof(cpu_set_t), &my_set); /* Set affinity of tihs process to */
+  sched_setaffinity(proc.pid(), sizeof(cpu_set_t), &my_set); /* Set affinity of tihs process to */
 
 #endif
 

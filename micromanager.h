@@ -39,7 +39,7 @@ public:
     void menu_main(int vmCount);
     void menu_vmInteraction();
     void menu_time_n_random_requests();
-
+    void menu_restrict_to_cores();
 
 signals:
     void allStarted();

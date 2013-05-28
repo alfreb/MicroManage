@@ -36,7 +36,7 @@ protected:
   virtual void halt()=0;
 
   //CPU control
-  virtual void assignToCores(std::vector<int> cores)=0;
+  virtual void assignToCores(std::vector<int> &cores)=0;
 
   //Communication
   virtual QString readAll()=0;

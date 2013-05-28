@@ -33,6 +33,7 @@ void microManager::menu_main(int vmCount){
          << "2 : Boot n VM's "<< endl
          << "3 : Shutdown n VM's"<< endl
          << "4 : Sample random response times"<< endl
+	 << "5 : Restrict VM's to certain cores " << endl
          << "q : Quit "<< endl
          << endl;
 
@@ -53,25 +54,51 @@ void microManager::userPrompt(){
 
         switch(QString(input.c_str()).at(0).toLower().toLatin1()){
         case '1':
-            menu_vmInteraction();
-            break;
+	  menu_vmInteraction();
+	  break;
         case '2':
-            menu_boot_n();
-            break;
+	  menu_boot_n();
+	  break;
         case '3':
-            menu_shutdown_n();
-            break;
+	  menu_shutdown_n();
+	  break;
         case '4':
-            menu_time_n_random_requests();
-            break;
+	  menu_time_n_random_requests();
+	  break;
+	case '5':
+	  menu_restrict_to_cores();
+	  break;
         case 'q':
-            cout <<"Exiting" << endl;
-            emit exit();
-            return;
+	  cout <<"Exiting" << endl;
+	  emit exit();
+	  return;
         }
     //}
 }
 
+void microManager::menu_restrict_to_cores(){
+  cout << "Enter a list of cpu-cores, between 1 and core count,  separated with enter. End with n <= 0 " << endl;
+  std::vector<int> cores;
+  int core;
+  do{
+    cin>>core;
+    if(core>0)
+      cores.push_back(core-1);
+  }while(core>0);
+      
+  cout << "Registered cores: " << endl;      
+  for(vector<int>::iterator it=cores.begin(); it!=cores.end();++it)
+    cout << *it << " ";
+  cout << endl;
+  cout << "Assigning..." << endl;
+
+  vector<qemuVm_qprocess*>::iterator it;
+  for(it=vms.begin();it!=vms.end();++it)
+    (*it)->assignToCores(cores);
+  
+  cout << "All processes reassigned" << endl;
+  emit this->menuItemComplete();
+}
 
 void microManager::menu_vmInteraction(){
     response data;
