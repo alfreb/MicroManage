@@ -216,8 +216,9 @@ void microManager::bootConfirmed(qemuVm_qprocess* p){
     int progWidth=50;
     if(++vmsBooted >= vms.size()){
 
-        emit menuItemComplete();
-        return;
+       // emit menuItemComplete();
+        qDebug()<< " All booted! " << endl;
+
     }else{
 
         float pct=(float(vmsBooted)/float(vms.size()))*progWidth;

@@ -8,7 +8,7 @@
 
 
 QString qemuVm_qprocess::command="./qemu_dummy";
-//QString qemuVm::command="qemu-system-i386";
+//QString qemuVm_qprocess::command="qemu-system-i386";
 
 QStringList cmd_args(){
   QStringList args;
@@ -43,9 +43,13 @@ void qemuVm_qprocess::boot(){
   proc.start(command,args);
 
   //This is necessary if the command is not valid, i.e. on mac.
+  //BUT IT WILL BREAK EVERYTHING!!
+
+  /*
   if(!proc.waitForStarted()){
       throw std::string("Unable to run "+command.toStdString());
-  }
+  }*/
+
 }
 
 void qemuVm_qprocess::halt(){

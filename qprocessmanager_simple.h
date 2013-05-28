@@ -4,12 +4,14 @@
 #include "QVector"
 #include "QProcess"
 
-class qprocessManager_simple
+class qprocessManager_simple //: public QObject
 {
+  //  Q_OBJECT
+
     QVector<QProcess*> vms;
 
 public:
-    qprocessManager_simple(QObject *parent);
+    explicit qprocessManager_simple(QObject *parent=0);
     ~qprocessManager_simple();
 };
 

@@ -6,6 +6,7 @@ using namespace std;
 
 
 qprocessManager_simple::qprocessManager_simple(QObject* parent)
+    //:QObject(parent)
 {
     QString command="./qemu_dummy";//"qemu-system-i386";//
     QStringList args;

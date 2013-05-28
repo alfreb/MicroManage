@@ -23,24 +23,22 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {        
-  
-  srand(time(0));
-  
-  qDebug("\nServerside MicroManager\n");
-  
-  QCoreApplication a(argc, argv);
 
+    srand(time(0));
 
- // qprocessManager_simple* manager=new qprocessManager_simple(&a);
- microManager* manager=new microManager(&a);
+    qDebug("\nServerside MicroManager\n");
 
-  QObject::connect(manager,SIGNAL(exit()), &a,SLOT(quit()));
-  QObject::connect(manager,SIGNAL(allBooted()),manager,SLOT(afterBoot()));
+    QCoreApplication a(argc, argv);
 
-  //Put the manager into the event-loop
-  QTimer::singleShot(0,manager,SLOT(userPrompt()));
+    // qprocessManager_simple* manager=new qprocessManager_simple(&a);
+    microManager* manager=new microManager(&a);
 
- return a.exec();
-  
+    QObject::connect(manager,SIGNAL(exit()), &a,SLOT(quit()));
+
+    //Put the manager into the event-loop
+    QTimer::singleShot(0,manager,SLOT(userPrompt()));
+
+    return a.exec();
+
 
 }
