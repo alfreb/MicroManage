@@ -7,8 +7,8 @@
  */
 
 
-QString qemuVm_qprocess::command="./qemu_dummy";
-//QString qemuVm_qprocess::command="qemu-system-i386";
+//QString qemuVm_qprocess::command="./qemu_dummy";
+QString qemuVm_qprocess::command="qemu-system-i386";
 
 QStringList cmd_args(){
   QStringList args;
