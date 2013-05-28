@@ -2,6 +2,7 @@
 #define QEMUVM_POPEN_H
 
 #include "micromachine.h"
+#include "stdio.h"
 
 class qemuVm_popen : public microMachine
 {
