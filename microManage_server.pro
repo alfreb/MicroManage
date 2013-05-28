@@ -19,13 +19,13 @@ SOURCES += main.cpp \
     micromachine.cpp \
     micromanager.cpp \
     qprocessmanager_simple.cpp \
-    qemuvm_qprocess.cpp \
-    qemuvm_popen.cpp
+    qemuvm_qprocess.cpp
+    #qemuvm_popen.cpp
 
 HEADERS += \
     micromachine.h \
     micromanager.h \
     qprocessmanager_simple.h \
-    qemuvm_qprocess.h \
-    qemuvm_popen.h
+    qemuvm_qprocess.h
+    #qemuvm_popen.h
 

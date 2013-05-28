@@ -27,6 +27,7 @@ public:
 
     virtual void boot();
     virtual void halt();    
+    virtual void assignToCores(std::vector<int> cores);
     virtual QString readAll();
     virtual void write(std::string s);
     virtual void processRequest(std::string req);

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTime>
+#include <QVector>
 
 //Would typically become a more complex type later, including it's own assessment of QoS
 typedef QString response;
@@ -33,6 +34,9 @@ protected:
   //Start / Stop
   virtual void boot()=0;
   virtual void halt()=0;
+
+  //CPU control
+  virtual void assignToCores(std::vector<int> cores)=0;
 
   //Communication
   virtual QString readAll()=0;

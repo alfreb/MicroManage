@@ -1,6 +1,15 @@
 #include "qemuvm_qprocess.h"
 #include "QDebug"
 #include <iostream>
+
+#ifndef __MACH__
+//LINUX-specific, for CPU core control
+#include <sched.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
+//#define _GNU_SOURCE
 /*
   Statics
 
@@ -23,8 +32,10 @@ QStringList qemuVm_qprocess::args=cmd_args();
   Construct / Destruct
 */
 qemuVm_qprocess::qemuVm_qprocess(QObject *parent) :
-    microMachine(),boot_char('!'),proc(this),timer(0) {
+    microMachine(),boot_char('!'),proc(this),timer(0)
+{
     connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
+
 }
 
 /*
@@ -59,6 +70,29 @@ void qemuVm_qprocess::halt(){
 void qemuVm_qprocess::halt_controlled(){
   proc.kill();
   connect(&proc,SIGNAL(finished(int)),this,SLOT(deleteLater()));
+}
+
+/*
+    CPU Control - Linux only
+*/
+void qemuVm_qprocess::assignToCores(std::vector<int> cores)
+{
+    proc.
+
+#ifndef __MACH__
+  pid_t pid=getpid();
+  cpu_set_t my_set;        /* Define your cpu_set bit mask. */
+  CPU_ZERO(&my_set);       /* Initialize it all to 0, i.e. no CPUs selected. */
+
+  vector<int>::iterator it;
+  for(it=cores.begin(); it!=cores.end(); ++it)
+    CPU_SET(*it, &my_set);     /* set the bit that represents core 7. */
+  sched_setaffinity(pid, sizeof(cpu_set_t), &my_set); /* Set affinity of tihs process to */
+
+#endif
+
+
+  /* the defined mask, i.e. only 7. */
 }
 
 

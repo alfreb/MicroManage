@@ -82,7 +82,7 @@ void microManager::menu_vmInteraction(){
     cout << endl << "Enter vm id: ";
     cin >> vmNr;
     if(vmNr>=0 and vmNr<vms.size()){
-        vm=vms[vmNr];
+        vm=vms[vmNr];                    
         cout << "Enter a single character request" << endl;
         cin >> req;        
         timedRequest(vm,req);
