@@ -5,9 +5,13 @@
 using namespace std;
 
 microManager::microManager(QObject *parent) :
-    QObject(parent),vmsBooted(0),pctBooted(0),progStep(0),samplesOrdered(0),sum_sampleTimes(0)
+  QObject(parent),vmsBooted(0),pctBooted(0),progStep(0),samplesOrdered(0),sum_sampleTimes(0),totalCPUCores(sysconf( _SC_NPROCESSORS_ONLN ))
 {
     connect(this,SIGNAL(menuItemComplete()),this,SLOT(userPrompt()));
+    
+    for(int i=0;i<totalCPUCores;i++){
+      freeCores.push_back(i);
+    }
 
 }
 
@@ -18,7 +22,7 @@ microManager::~microManager(){
         (*it)->halt();
         //No need to delete the objects - it will take forever and we're exiting anyway.
         //delete(*it);
-    }
+    }    
 
 }
 
@@ -34,6 +38,7 @@ void microManager::menu_main(int vmCount){
          << "3 : Shutdown n VM's"<< endl
          << "4 : Sample random response times"<< endl
 	 << "5 : Restrict VM's to certain cores " << endl
+	 << "6 : Sample random response, with automatic CPU-reassign"<< endl
          << "q : Quit "<< endl
          << endl;
 
@@ -67,6 +72,9 @@ void microManager::userPrompt(){
 	  break;
 	case '5':
 	  menu_restrict_to_cores();
+	  break;
+	case '6':
+	  menu_time_n_random_requests(true);
 	  break;
         case 'q':
 	  cout <<"Exiting" << endl;
@@ -120,17 +128,21 @@ void microManager::menu_vmInteraction(){
     //
 }
 
-void microManager::timedRequest(qemuVm_qprocess *vm,std::string req){
+void microManager::timedRequest(qemuVm_qprocess *vm,std::string req,vector<int>* onCores){
 
     vmsRequested.push_back(vm);
 
     qDebug()<<"Requesting VM " << vm->id();
     connect(vm,SIGNAL(timedRequestHandled(qemuVm_qprocess*,int)),this,SLOT(timedRequestHandled(qemuVm_qprocess*,int)));
-    vm->processRequest_timed(req);
+    if(!onCores)
+      vm->processRequest_timed(req);
+    else{            
+      vm->processRequest_timed_withCoreReassign(req,*onCores);
+    }
 
 }
 
-void microManager::menu_time_n_random_requests(){
+void microManager::menu_time_n_random_requests(bool withCoreReassign){
     int sampleCount(0);
     int vmNr(0);
 
@@ -152,6 +164,11 @@ void microManager::menu_time_n_random_requests(){
     cout << "------------------------------------------------------------------" << endl;
     this->samplesOrdered=sampleCount;
     this->sum_sampleTimes=0;
+    
+    vector<int>* cores=0;
+    if(withCoreReassign){
+      cores=&freeCores;
+    }
 
     for(int i=0;i<samplesOrdered; i++){
 
@@ -160,7 +177,8 @@ void microManager::menu_time_n_random_requests(){
             vmNr=rand() % vms.size();
         }while(find(vmsRequested.begin(),vmsRequested.end(),vms[vmNr])!=vmsRequested.end());
 
-        timedRequest(vms[vmNr],"a");
+	timedRequest(vms[vmNr],"a",cores);
+	  
     }
     /*
     cout << endl << "Average response time over "

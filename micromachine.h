@@ -43,6 +43,8 @@ protected:
   virtual void write(std::string s)=0;
   virtual void processRequest(std::string req)=0;
   virtual void processRequest_timed(std::string req)=0;
+  virtual void processRequest_timed_withCoreReassign(std::string req,
+						     std::vector<int>& cores)=0;
 
   //Getters
   QString name();

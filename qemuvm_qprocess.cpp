@@ -182,6 +182,18 @@ void qemuVm_qprocess::processRequest_timed(std::string req){
   write(req);
 }
 
+void qemuVm_qprocess::processRequest_timed_withCoreReassign(std::string req,
+							    std::vector<int>& cores)
+{    
+  connect(&proc,SIGNAL(readyRead()),this,SLOT(timedRequestDone()));
+  timer=new QTime;
+  timer->start();  
+  int core=rand()% cores.size();
+  std::vector<int> coreList(1,core);
+  assignToCores(coreList);
+  write(req);
+}
+
 void qemuVm_qprocess::firstByteRecieved(){
     QByteArray data=proc.readAll();
     //proc.state()
