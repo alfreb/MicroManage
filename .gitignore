@@ -4,5 +4,12 @@
 *.dSYM
 *.xcodeproj
 *.user
+
+//Qt specific
+moc_*
+*.autosave
+
+
 qemu_dummy
 popen_test
+microManage_server

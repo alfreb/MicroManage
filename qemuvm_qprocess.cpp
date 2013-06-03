@@ -7,6 +7,7 @@
 #include <sched.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 #endif
 
 //#define _GNU_SOURCE
@@ -75,12 +76,14 @@ void qemuVm_qprocess::halt_controlled(){
 /*
     CPU Control - Linux only
 */
+
 void qemuVm_qprocess::assignToCores(std::vector<int> cores)
 {
-    proc.
+    QString s="asdf";
+    s+=5;
 
 #ifndef __MACH__
-  pid_t pid=getpid();
+
   cpu_set_t my_set;        /* Define your cpu_set bit mask. */
   CPU_ZERO(&my_set);       /* Initialize it all to 0, i.e. no CPUs selected. */
 
