@@ -27,12 +27,14 @@ public:
 
     virtual void boot();
     virtual void halt();    
-    virtual void assignToCores(std::vector<int> cores);
+    virtual void assignToCores(std::vector<int> &cores);
     virtual QString readAll();
     virtual void write(std::string s);
     virtual void processRequest(std::string req);
     virtual void processRequest_timed(std::string req);
-
+    virtual void processRequest_timed_withCoreReassign(std::string req,
+						       std::vector<int>& cores);
+    
     //Halt, and delete self when process is stopped
     void halt_controlled();
 

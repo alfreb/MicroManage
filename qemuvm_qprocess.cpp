@@ -1,6 +1,8 @@
+
 #include "qemuvm_qprocess.h"
 #include "QDebug"
 #include <iostream>
+#include <vector>
 
 #ifndef __MACH__
 //LINUX-specific, for CPU core control
@@ -19,9 +21,11 @@
 
 //QString qemuVm_qprocess::command="./qemu_dummy";
 QString qemuVm_qprocess::command="qemu-system-i386";
+//QString qemuVm_qprocess::command="taskset";
 
 QStringList cmd_args(){
   QStringList args;
+  //  args << "-c"<< "19-24"<<"qemu-system-i386";
   args << "-hda" << "../microMachines_experimental_clean/microMachine.hda";
   args << "--nographic";
   return args;
@@ -76,23 +80,65 @@ void qemuVm_qprocess::halt_controlled(){
 /*
     CPU Control - Linux only
 */
-
-void qemuVm_qprocess::assignToCores(std::vector<int> cores)
+void qemuVm_qprocess::assignToCores(std::vector<int> &cores)
 {
-    QString s="asdf";
-    s+=5;
+  QProcess* p=new QProcess;
+  QStringList args;
+
+  args << "-a" << "-p" << "-c";
+
+  QString s="";
+  
+  
+  std::vector<int>::iterator it;
+  for(it=cores.begin(); it!=cores.end(); ++it){
+    s+=QString::number(*it);
+    if(it!=cores.end()-1)
+      s+=",";
+  }
+  args << s;
+  args << QString::number(proc.pid());
+
+  QString cmd="taskset";
+
+  
+  //  Print taskset command
+  /*
+    QStringList::iterator lit;
+    std::cout << cmd.toStdString() << " ";
+    for(lit=args.begin();lit!=args.end(); ++lit)
+    std::cout << lit->toStdString() << " ";
+    std::cout << std::endl;
+  */
+
+  p->start(cmd,args);
+  
+  //Print command output
+  /*
+  p->waitForReadyRead();
+  qDebug()<<p->readAll();
+  */
+  
+  p->waitForFinished();
+  delete p;
+
+ /*
+
+   DIRECT SYSTEM CALL
+   - For this to work, each thread has to be set individually
+   - Taskset has the -a option which does this for you
 
 #ifndef __MACH__
-
-  cpu_set_t my_set;        /* Define your cpu_set bit mask. */
-  CPU_ZERO(&my_set);       /* Initialize it all to 0, i.e. no CPUs selected. */
-
-  vector<int>::iterator it;
+  std::cout << "Setting affinity for PID " << proc.pid() << std::endl;
+  cpu_set_t my_set;        // Define your cpu_set bit mask. 
+  CPU_ZERO(&my_set);       // Initialize it all to 0, i.e. no CPUs selected. 
+  std::vector<int>::iterator it;
   for(it=cores.begin(); it!=cores.end(); ++it)
-    CPU_SET(*it, &my_set);     /* set the bit that represents core 7. */
-  sched_setaffinity(pid, sizeof(cpu_set_t), &my_set); /* Set affinity of tihs process to */
+    CPU_SET(*it, &my_set);     // set the bit that represents core 7.
+  sched_setaffinity(proc.pid(), sizeof(cpu_set_t), &my_set); // Set affinity of tihs process to 
 
 #endif
+*/
 
 
   /* the defined mask, i.e. only 7. */
@@ -132,6 +178,18 @@ void qemuVm_qprocess::processRequest_timed(std::string req){
   connect(&proc,SIGNAL(readyRead()),this,SLOT(timedRequestDone()));
   timer=new QTime;
   timer->start();
+  write(req);
+}
+
+void qemuVm_qprocess::processRequest_timed_withCoreReassign(std::string req,
+							    std::vector<int>& cores)
+{    
+  connect(&proc,SIGNAL(readyRead()),this,SLOT(timedRequestDone()));
+  timer=new QTime;
+  timer->start();  
+  int core=rand()% cores.size();
+  std::vector<int> coreList(1,core);
+  assignToCores(coreList);
   write(req);
 }
 

@@ -1,3 +1,10 @@
+TODO:
+------------------------------
+- Detect ulimit
+- Changing all variables via simulator
+
+PREREQUESITS:
+------------------------------
 set ulimit:
 
 ulimit -n 102400

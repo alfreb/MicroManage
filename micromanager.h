@@ -10,6 +10,15 @@ class microManager : public QObject
     Q_OBJECT
 
     QTime t;
+    
+    //System, CPU related
+    int totalCPUCores;
+    //Cores available for VM's to freely move to
+    std::vector<int> freeCores;
+    //Cores restricting VM's by default
+    std::vector<int> lockedCores;
+    
+    //VM containter
     std::vector<qemuVm_qprocess*> vms;
     int vmsBooted;
     int pctBooted;
@@ -29,7 +38,7 @@ public:
 
     void boot_n(int n);
     void shutdown_n(int n);
-    void timedRequest(qemuVm_qprocess* vm, std::string req);
+    void timedRequest(qemuVm_qprocess* vm, std::string req,std::vector<int>* onCores=0);
 
     /*
         Terminal UI menu items (Move to View class)
@@ -38,8 +47,8 @@ public:
     void menu_shutdown_n();
     void menu_main(int vmCount);
     void menu_vmInteraction();
-    void menu_time_n_random_requests();
-
+    void menu_time_n_random_requests(bool withCpuReassign=0);
+    void menu_restrict_to_cores();
 
 signals:
     void allStarted();
