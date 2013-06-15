@@ -33,6 +33,7 @@ void experiment::samplingDone(){
         manager->boot_n(bootBatchSize);
     }else{
         cout << "Sampling complete" << endl;
+        stopTime=QDateTime::currentDateTime();
         sampler->printSamples(&cout);
         sampler->dumpData_separateFiles(experimentInfo());
         emit experimentComplete();
