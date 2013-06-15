@@ -26,10 +26,15 @@ class experiment : public QObject
 
     int samplesToCollect;
     int samplesCollected;
+
     int bootBatchSize;
+    int sampleInterval;
 
     QDateTime startTime;
     QDateTime stopTime;
+
+    float maxCpu;
+    float maxMem;
 
 protected:
     std::string description;
@@ -38,6 +43,7 @@ protected:
     //virtual endCondition;
 public:
     explicit experiment(microManager* _manager,QObject *parent = 0);
+    std::string experimentInfo();
     void start();
 
 signals:

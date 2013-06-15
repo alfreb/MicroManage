@@ -27,7 +27,7 @@ SOURCES += main.cpp \
     ../perfdata/perfSampler.cpp \
     ../perfdata/memDataPoint.cpp \
     ../perfdata/cpuSample2.cpp \
-    ../perfdata/sample.cpp
+    ../perfdata/scalingSample.cpp
     #qemuvm_popen.cpp
 
 HEADERS += \
@@ -40,7 +40,7 @@ HEADERS += \
     ../perfdata/perfSampler.h \
     ../perfdata/memDataPoint.h \
     ../perfdata/cpuSample2.h \
-    ../perfdata/sample.h \
-    outstream.h
+    outstream.h \
+    ../perfdata/scalingSample.h
     #qemuvm_popen.h
 
