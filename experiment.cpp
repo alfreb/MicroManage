@@ -5,8 +5,8 @@
 using namespace std;
 experiment::experiment(microManager* _manager, QObject *parent) :
     QObject(parent),manager(_manager),
-    samplesToCollect(3),samplesCollected(0),bootBatchSize(48),
-    sampler(new perfdata::perfsampler(true))
+    samplesToCollect(10),samplesCollected(0),bootBatchSize(48),
+    sampler(new perfdata::perfsampler(_manager,true))
 {}
 
 
@@ -16,17 +16,13 @@ void experiment::samplingDone(){
              << sampler->numberOfSamples() << " / "
              << samplesToCollect << " samples. Continuing."
              << endl;
-        sampler->start();
+
+            connect(manager,SIGNAL(n_confirmed_boot()),this,SLOT(bootingDone()));
+            manager->boot_n(bootBatchSize);
     }else{
         cout << "Sampling complete" << endl;
         sampler->printSamples(&cout);
-        if(manager->getVmsBooted()>=samplesToCollect*bootBatchSize){
-            emit experimentComplete();
-            return;
-        }else{
-            connect(manager,SIGNAL(n_confirmed_boot()),this,SLOT(bootingDone()));
-            manager->boot_n(bootBatchSize);
-        }
+        emit experimentComplete();
     }        
 }
 
