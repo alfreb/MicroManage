@@ -37,7 +37,7 @@ QStringList qemuVm_qprocess::args=cmd_args();
   Construct / Destruct
 */
 qemuVm_qprocess::qemuVm_qprocess(QObject *parent) :
-    microMachine(),boot_char('!'),proc(this),timer(0)
+    microMachine(),proc(this),boot_char('!'),timer(0)
 {
     connect(&proc,SIGNAL(readyRead()),this,SLOT(firstByteRecieved()));
 

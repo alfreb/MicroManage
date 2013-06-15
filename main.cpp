@@ -29,6 +29,9 @@ int main(int argc, char *argv[])
     qDebug("\nServerside MicroManager\n");
 
     QCoreApplication a(argc, argv);
+    a.setApplicationName("microManage server");
+    a.setOrganizationDomain("cs.hioa.no");
+    a.setOrganizationName("NSA group, Dept. of Coumputer Science, HiOA");
 
     // qprocessManager_simple* manager=new qprocessManager_simple(&a);
     microManager* manager=new microManager(&a);

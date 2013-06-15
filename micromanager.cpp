@@ -1,18 +1,26 @@
-#include "micromanager.h"
 #include <iostream>
+#include <fstream>
 #include <QDebug>
+#include <QThread>
+
+#include "micromanager.h"
+#include "experiment.h"
 
 using namespace std;
 
 microManager::microManager(QObject *parent) :
-  QObject(parent),vmsBooted(0),pctBooted(0),progStep(0),samplesOrdered(0),sum_sampleTimes(0),totalCPUCores(sysconf( _SC_NPROCESSORS_ONLN ))
+    QObject(parent),vmsBooted(0),pctBooted(0),progStep(0),samplesOrdered(0),sum_sampleTimes(0),totalCPUCores(sysconf( _SC_NPROCESSORS_ONLN ))
 {
     connect(this,SIGNAL(menuItemComplete()),this,SLOT(userPrompt()));
     
     for(int i=0;i<totalCPUCores;i++){
-      freeCores.push_back(i);
+        freeCores.push_back(i);
     }
 
+    //QThread* thread1=new QThread;
+    //perf->moveToThread(thread1);
+    //connect(thread1,SIGNAL(started()),perf,SLOT(startSampling()));
+    //connect(thread1,SIGNAL())
 }
 
 microManager::~microManager(){
@@ -22,7 +30,7 @@ microManager::~microManager(){
         (*it)->halt();
         //No need to delete the objects - it will take forever and we're exiting anyway.
         //delete(*it);
-    }    
+    }
 
 }
 
@@ -37,8 +45,9 @@ void microManager::menu_main(int vmCount){
          << "2 : Boot n VM's "<< endl
          << "3 : Shutdown n VM's"<< endl
          << "4 : Sample random response times"<< endl
-	 << "5 : Restrict VM's to certain cores " << endl
-	 << "6 : Sample random response, with automatic CPU-reassign"<< endl
+         << "5 : Restrict VM's to certain cores " << endl
+         << "6 : Sample random response, with automatic CPU-reassign"<< endl
+         << "7 : Run Scaling Profile Experiment"<< endl
          << "q : Quit "<< endl
          << endl;
 
@@ -49,63 +58,66 @@ void microManager::userPrompt(){
 
     // while(true){
 
-        menu_main(vms.size());
+    menu_main(vms.size());
 
-        int reqs(0);
-        while(input.size()<1){
-            cout << endl << ++reqs << " microManage$ ";
-            std::getline(cin,input);
-        }
+    int reqs(0);
+    while(input.size()<1){
+        cout << endl << ++reqs << " microManage$ ";
+        std::getline(cin,input);
+    }
 
-        switch(QString(input.c_str()).at(0).toLower().toLatin1()){
-        case '1':
-	  menu_vmInteraction();
-	  break;
-        case '2':
-	  menu_boot_n();
-	  break;
-        case '3':
-	  menu_shutdown_n();
-	  break;
-        case '4':
-	  menu_time_n_random_requests();
-	  break;
-	case '5':
-	  menu_restrict_to_cores();
-	  break;
-	case '6':
-	  menu_time_n_random_requests(true);
-	  break;
-        case 'q':
-	  cout <<"Exiting" << endl;
-	  emit exit();
-	  return;
-        }
+    switch(QString(input.c_str()).at(0).toLower().toLatin1()){
+    case '1':
+        menu_vmInteraction();
+        break;
+    case '2':
+        menu_boot_n();
+        break;
+    case '3':
+        menu_shutdown_n();
+        break;
+    case '4':
+        menu_time_n_random_requests();
+        break;
+    case '5':
+        menu_restrict_to_cores();
+        break;
+    case '6':
+        menu_time_n_random_requests(true);
+        break;
+    case '7':
+        menu_run_scaling_profile_experiment();
+        break;
+    case 'q':
+        cout <<"Exiting" << endl;
+        emit exit();
+        return;
+    }
     //}
 }
 
 void microManager::menu_restrict_to_cores(){
-  cout << "Enter a list of cpu-cores, between 1 and core count,  separated with enter. End with n <= 0 " << endl;
-  std::vector<int> cores;
-  int core;
-  do{
-    cin>>core;
-    if(core>0)
-      cores.push_back(core-1);
-  }while(core>0);
-      
-  cout << "Registered cores: " << endl;      
-  for(vector<int>::iterator it=cores.begin(); it!=cores.end();++it)
-    cout << *it << " ";
-  cout << endl;
-  cout << "Assigning..." << endl;
+    cout << "Enter a list of cpu-cores, between 1 and core count,  separated with enter. End with n <= 0 " << endl;
+    std::vector<int> cores;
+    int core;
+    do{
+        cin>>core;
+        if(core>0)
+            cores.push_back(core-1);
+    }while(core>0);
 
-  vector<qemuVm_qprocess*>::iterator it;
-  for(it=vms.begin();it!=vms.end();++it)
-    (*it)->assignToCores(cores);
-  
-  cout << "All processes reassigned" << endl;
-  emit this->menuItemComplete();
+    cout << "Registered cores: " << endl;
+    for(vector<int>::iterator it=cores.begin(); it!=cores.end();++it)
+        cout << *it << " ";
+    cout << endl;
+    cout << "Assigning..." << endl;
+
+    vector<qemuVm_qprocess*>::iterator it;
+    for(it=vms.begin();it!=vms.end();++it)
+        (*it)->assignToCores(cores);
+
+    cout << "All processes reassigned" << endl;
+    emit this->menuItemComplete();
 }
 
 void microManager::menu_vmInteraction(){
@@ -117,9 +129,9 @@ void microManager::menu_vmInteraction(){
     cout << endl << "Enter vm id: ";
     cin >> vmNr;
     if(vmNr>=0 and vmNr<vms.size()){
-        vm=vms[vmNr];                    
+        vm=vms[vmNr];
         cout << "Enter a single character request" << endl;
-        cin >> req;        
+        cin >> req;
         timedRequest(vm,req);
     }else{
         cout << "Invalid ID. Type a number between 0 and " << vms.size() << endl;
@@ -135,11 +147,17 @@ void microManager::timedRequest(qemuVm_qprocess *vm,std::string req,vector<int>*
     qDebug()<<"Requesting VM " << vm->id();
     connect(vm,SIGNAL(timedRequestHandled(qemuVm_qprocess*,int)),this,SLOT(timedRequestHandled(qemuVm_qprocess*,int)));
     if(!onCores)
-      vm->processRequest_timed(req);
-    else{            
-      vm->processRequest_timed_withCoreReassign(req,*onCores);
+        vm->processRequest_timed(req);
+    else{
+        vm->processRequest_timed_withCoreReassign(req,*onCores);
     }
 
+}
+
+void microManager::menu_run_scaling_profile_experiment(){
+    experiment* e=new experiment(this);
+    connect(e,SIGNAL(experimentComplete()),this,SLOT(userPrompt()));
+    e->start();
 }
 
 void microManager::menu_time_n_random_requests(bool withCoreReassign){
@@ -167,7 +185,7 @@ void microManager::menu_time_n_random_requests(bool withCoreReassign){
     
     vector<int>* cores=0;
     if(withCoreReassign){
-      cores=&freeCores;
+        cores=&freeCores;
     }
 
     for(int i=0;i<samplesOrdered; i++){
@@ -177,8 +195,8 @@ void microManager::menu_time_n_random_requests(bool withCoreReassign){
             vmNr=rand() % vms.size();
         }while(find(vmsRequested.begin(),vmsRequested.end(),vms[vmNr])!=vmsRequested.end());
 
-	timedRequest(vms[vmNr],"a",cores);
-	  
+        timedRequest(vms[vmNr],"a",cores);
+
     }
     /*
     cout << endl << "Average response time over "
@@ -186,18 +204,9 @@ void microManager::menu_time_n_random_requests(bool withCoreReassign){
          << endl;*/
 }
 
-void microManager::boot_n(int n){
-    qemuVm_qprocess* vm;
-    //pctBooted=0;
-    for(int i=0;i<n; i++){
-        vm=new qemuVm_qprocess(this);
-        vm->boot();        
-        vms.push_back(vm);
-        connect(vm,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
-        //connect(vm,SIGNAL(requestHandled(qemuVm_qprocess*, QByteArray)),this,SLOT(requestHandled(qemuVm_qprocess*,QByteArray)));
-    }
-    //vmCount=vms.size();
-}
+
+
+
 
 void microManager::shutdown_n(int n){
     qDebug()<<"Shutting down "<< n << " vm's";
@@ -212,7 +221,6 @@ void microManager::shutdown_n(int n){
 
         vms.pop_back();
         vm->halt();
-
         //vm->deleteLater();
         //disconnect(vm,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
         //connect(vm,SIGNAL(requestHandled(qemuVm_qprocess*, QByteArray)),this,SLOT(requestHandled(qemuVm_qprocess*,QByteArray)));
@@ -241,12 +249,26 @@ void microManager::menu_shutdown_n(){
 
 }
 
+void microManager::boot_n(int n){
+    qemuVm_qprocess* vm;
+    //pctBooted=0;
+    for(int i=0;i<n; i++){
+        vm=new qemuVm_qprocess(this);
+        vm->boot();
+        vms.push_back(vm);
+        connect(vm,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
+        //connect(vm,SIGNAL(requestHandled(qemuVm_qprocess*, QByteArray)),this,SLOT(requestHandled(qemuVm_qprocess*,QByteArray)));
+    }
+    //vmCount=vms.size();
+}
+
 void microManager::menu_boot_n(){
     int count(0);
     cout << endl << "How many do you want to boot? ";
     cin>>count;
 
     cout << "Booting " << count << "  machines" << endl;
+    connect(this,SIGNAL(n_confirmed_boot()),this,SLOT(complete_menu_boot_n()));
     try{
         boot_n(count);
     }catch(string s){
@@ -254,6 +276,10 @@ void microManager::menu_boot_n(){
     }
 }
 
+void microManager::complete_menu_boot_n(){
+    disconnect(this,SIGNAL(n_confirmed_boot()),this,SLOT(complete_menu_boot_n()));
+    emit menuItemComplete();
+}
 
 void microManager::bootConfirmed(qemuVm_qprocess* p){
     disconnect(p,SIGNAL(bootConfirmed(qemuVm_qprocess*)),this,SLOT(bootConfirmed(qemuVm_qprocess*)));
@@ -261,8 +287,8 @@ void microManager::bootConfirmed(qemuVm_qprocess* p){
     int progWidth=50;
     if(++vmsBooted >= vms.size()){
 
-       qDebug()<< " All booted! " << endl;
-       emit menuItemComplete();
+        qDebug()<< " All booted! " << endl;
+        emit n_confirmed_boot();
 
 
     }else{
@@ -314,4 +340,5 @@ void microManager::timedRequestHandled(qemuVm_qprocess * p, int t){
 
 }
 
+int microManager::getVmsBooted(){return vms.size();}
 

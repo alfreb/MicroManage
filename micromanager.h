@@ -5,6 +5,7 @@
 #include <vector>
 #include <qemuvm_qprocess.h>
 
+
 class microManager : public QObject
 {
     Q_OBJECT
@@ -36,9 +37,14 @@ public:
     explicit microManager(QObject *parent = 0);
     ~microManager();
 
+    //VM Control
     void boot_n(int n);
     void shutdown_n(int n);
     void timedRequest(qemuVm_qprocess* vm, std::string req,std::vector<int>* onCores=0);
+
+    //Getters
+    int getVmsBooted();
+
 
     /*
         Terminal UI menu items (Move to View class)
@@ -49,14 +55,19 @@ public:
     void menu_vmInteraction();
     void menu_time_n_random_requests(bool withCpuReassign=0);
     void menu_restrict_to_cores();
+    void menu_run_scaling_profile_experiment();        
 
 signals:
-    void allStarted();
-    void bootConfirmedAll(); //Connect to user prompt
+    //void allStarted();
+    //void bootConfirmedAll(); //Connect to user prompt
+    void n_confirmed_boot();
     void menuItemComplete();
     void exit();
 
 public slots:
+    //Custom slots for menuItems completing
+    void complete_menu_boot_n();
+
      void userPrompt();
      void bootConfirmed(qemuVm_qprocess*); //One VM confirmed boot
      void timedRequestHandled(qemuVm_qprocess*, int);
