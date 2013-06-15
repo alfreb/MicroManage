@@ -14,7 +14,8 @@ experiment::experiment(microManager* _manager, QObject *parent) :
     desc+="Cpu Limit: "+QString::number(maxCpu)
             +" Mem Limit: "+QString::number(maxMem)
             +" Batch size: "+QString::number(bootBatchSize)
-            +" Sample rate: "+QString::number(sampleInterval);
+            +" Sample rate: "+QString::number(sampleInterval)
+            +"\n";
     description=desc.toStdString();
 
 }
@@ -40,8 +41,8 @@ void experiment::samplingDone(){
 
 string experiment::experimentInfo(){
     QString s(this->description.c_str());
-    s+="Started: " + this->startTime.toString();
-    s+="Ended: " + this->stopTime.toString();
+    s+="Started: " + this->startTime.toString()+"\n";
+    s+="Ended: " + this->stopTime.toString()+"\n";
     return s.toStdString();
 }
 
