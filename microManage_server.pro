@@ -40,6 +40,7 @@ HEADERS += \
     ../perfdata/memDataPoint.h \
     ../perfdata/cpuSample2.h \
     outstream.h \
-    ../perfdata/scalingSample.h
+    ../perfdata/scalingSample.h \
+    ../perfdata/globals.h
     #qemuvm_popen.h
 

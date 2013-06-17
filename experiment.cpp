@@ -6,15 +6,17 @@ using namespace std;
 experiment::experiment(microManager* _manager, QObject *parent) :
     QObject(parent),manager(_manager),
     samplesToCollect(20),samplesCollected(0),
-    bootBatchSize(480),sampleInterval(2),
+    bootBatchSize(480),multiSampleInterval(6),
+    multiSampleCount(15),
     maxCpu(90.0),maxMem(90.0),
-    sampler(new perfdata::perfsampler(_manager,true))
+    sampler(new perfdata::perfsampler(_manager,multiSampleInterval,multiSampleCount,true))
 {
     QString desc="Scalability test. \n";
     desc+="Cpu Limit: "+QString::number(maxCpu)
             +" Mem Limit: "+QString::number(maxMem)
             +" Batch size: "+QString::number(bootBatchSize)
-            +" Sample rate: "+QString::number(sampleInterval)
+            +" Sample rate: "+QString::number(multiSampleInterval)
+            +" No. of Multisamples: "+QString::number(multiSampleCount)
             +"\n";
     description=desc.toStdString();
 

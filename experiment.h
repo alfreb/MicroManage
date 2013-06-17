@@ -28,7 +28,8 @@ class experiment : public QObject
     int samplesCollected;
 
     int bootBatchSize;
-    int sampleInterval;
+    int multiSampleInterval;
+    int multiSampleCount;
 
     QDateTime startTime;
     QDateTime stopTime;
