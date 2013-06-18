@@ -2,10 +2,11 @@
 #include <fstream>
 #include <QDebug>
 #include <QThread>
+#include <unistd.h>
 
 #include "micromanager.h"
 #include "experiment.h"
-
+//#include "../perfdata/perfSampler.h"
 using namespace std;
 
 microManager::microManager(QObject *parent) :
@@ -48,6 +49,7 @@ void microManager::menu_main(int vmCount){
          << "5 : Restrict VM's to certain cores " << endl
          << "6 : Sample random response, with automatic CPU-reassign"<< endl
          << "7 : Run Scaling Profile Experiment"<< endl
+         << "8 : Sample CPU (multisample) and memory (single sample)"<< endl
          << "q : Quit "<< endl
          << endl;
 
@@ -88,6 +90,9 @@ void microManager::userPrompt(){
     case '7':
         menu_run_scaling_profile_experiment();
         break;
+    case '8':
+        menu_perfsampler();
+	break;
     case 'q':
         cout <<"Exiting" << endl;
         emit exit();
@@ -96,6 +101,51 @@ void microManager::userPrompt(){
     //}
 }
 
+void microManager::menu_perfsampler(){
+
+    int sampleRate(1),sampleCount(6),iterations(10);
+    bool log(true);
+    
+    cout << "Sampling memory and CPU. "
+         << "Default setup is:" << endl
+         << iterations << " multisamples, "
+         << "each an average (with errors) of " << sampleCount
+         << " individual samples collected with " << sampleRate
+         << " second(s) interval. Simple logging to file is on. "<< endl
+	 << " logging to separate files (for mac plot) is off." << endl
+         << " 'c' to change, 'y' (or anything) to go on: ";
+
+    char in;
+      //    cin>>in;
+    string line;
+    getline(cin, line);
+    in=line[0];
+    
+    if(in=='c' or in=='C'){
+      cout << "Total number of multisamples: "; 
+      cin >> iterations;
+      cout << "Samples pr. multisample: "; 
+      cin >> sampleCount;
+      cout << "Sample rate: "; 
+      cin >> sampleRate;
+      cout << "Log to separate files? (bool,1 or 0)"; 
+      cin >> log;
+      
+    }
+    
+    sampler=new perfdata::perfsampler(this,sampleRate,sampleCount,true,sampleRate,iterations,log);
+    connect(sampler,SIGNAL(samplingDone()),this,SLOT(complete_menu_perfsampler()));
+    
+    sampler->start();
+
+    cout << "Sampler started" << endl;
+}
+
+
+void microManager::complete_menu_perfsampler(){
+
+  emit menuItemComplete();
+}
 void microManager::menu_restrict_to_cores(){
     cout << "Enter a list of cpu-cores, between 1 and core count,  separated with enter. End with n <= 0 " << endl;
     std::vector<int> cores;

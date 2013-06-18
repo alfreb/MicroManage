@@ -4,6 +4,8 @@
 *.dSYM
 *.xcodeproj
 *.user
+*.dat
+
 
 //Qt specific
 moc_*
