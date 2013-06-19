@@ -1,25 +1,27 @@
 #include <iostream>
-
+#include <unistd.h>
 #include "experiment.h"
 
 using namespace std;
 experiment::experiment(microManager* _manager, QObject *parent) :
     QObject(parent),manager(_manager),
-    samplesToCollect(20),samplesCollected(0),
+    samplesToCollect(10),samplesCollected(0),
     bootBatchSize(480),multiSampleInterval(6),
     multiSampleCount(15),
     maxCpu(90.0),maxMem(90.0),
+    bootLeadOutTime(5),
     sampler(new perfdata::perfsampler(_manager,multiSampleInterval,multiSampleCount,true))
 {
-    QString desc="Scalability test. \n";
+  QString desc="Scalability test. \n";
     desc+="Cpu Limit: "+QString::number(maxCpu)
-            +" Mem Limit: "+QString::number(maxMem)
-            +" Batch size: "+QString::number(bootBatchSize)
-            +" Sample rate: "+QString::number(multiSampleInterval)
-            +" No. of Multisamples: "+QString::number(multiSampleCount)
-            +"\n";
+      +" Mem Limit: "+QString::number(maxMem)
+      +" Batch size: "+QString::number(bootBatchSize)
+      +" BootLeadOutTime: "+QString::number(bootLeadOutTime)
+      +" Sample rate: "+QString::number(multiSampleInterval)
+      +" No. of Multisamples: "+QString::number(multiSampleCount)
+      +"\n";
     description=desc.toStdString();
-
+    
 }
 
 
@@ -50,7 +52,8 @@ string experiment::experimentInfo(){
 }
 
 void experiment::bootingDone(){
-    cout << manager->getVmsBooted() << " vm's booted. Sampling." << endl;
+  cout << manager->getVmsBooted() << " vm's booted. Waiting " << bootLeadOutTime << " seconds  before sampling..." << endl;
+  sleep(bootLeadOutTime);
     disconnect(manager,SIGNAL(n_confirmed_boot()),this,SLOT(bootingDone()));
     sampler->start();
 }
